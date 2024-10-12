@@ -1,3 +1,8 @@
+author = "waifod"
+title = "~/waifod"
+
+theme = "papermod"
+
 # The URL the site will be built for
 base_url = "https://waifod.com"
 
@@ -7,6 +12,12 @@ compile_sass = true
 # Whether to build a search index to be used later on by a JavaScript library
 build_search_index = false
 
+generate_feeds = true
+feed_filenames = ["atom.xml"]
+minify_html = true
+
+taxonomies = [{ name = "tags", feed = true }]
+
 [markdown]
 # Whether to do syntax highlighting
 # Theme can be customised by setting the `highlight_theme` variable to a theme supported by Zola
@@ -14,3 +25,22 @@ highlight_code = false
 
 [extra]
 # Put all your custom variables here
+
+[extra.papermod]
+title = "~/waifod"
+default_theme = "auto"
+theme = "dark"
+language_direction = "auto"
+
+keywords = ["keyword1", "keyword2", "keyword3"]
+show_theme_toggle = true
+show_scroll_to_top = true
+show_code_copy_buttons = true
+show_reading_time = true
+show_word_count = false
+show_post_nav_links = true
+show_post_meta = true
+default_toc_open = false
+show_post_edit_button = false
+
+date_format = "%d-%m-%Y"
