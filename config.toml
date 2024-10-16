@@ -1,5 +1,5 @@
 author = "waifod"
-title = "~/waifod"
+title = "waifod"
 
 theme = "papermod"
 
@@ -27,7 +27,8 @@ highlight_code = false
 # Put all your custom variables here
 
 [extra.papermod]
-title = "~/waifod"
+title = "waifod"
+home_title = "#waifod"
 default_theme = "auto"
 theme = "dark"
 language_direction = "auto"
@@ -44,3 +45,17 @@ default_toc_open = false
 show_post_edit_button = false
 
 date_format = "%d-%m-%Y"
+
+home_content = "Welcome to my personal website!<br>I am a mathematician and a software engineer who tries to do stuff and get better at it."
+social_icons = [
+  { url = "https://github.com/waifod", title = "GitHub", icon = "github" },
+  { url = "https://www.linkedin.com/in/waifod/", title = "LinkedIn", icon = "linkedin" },
+  { url = "$BASE_URL/atom.xml", title = "RSS", icon = "rss" },
+]
+
+navigation = [
+  { url = "$BASE_URL/posts", title = "posts" },
+  { url = "$BASE_URL/archive", title = "archive" },
+  { url = "$BASE_URL/tags", title = "tags" },
+  { url = "$BASE_URL/search", title = "search" },
+]
