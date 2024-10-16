@@ -12,11 +12,29 @@ compile_sass = true
 # Whether to build a search index to be used later on by a JavaScript library
 build_search_index = false
 
+#hard_link_static = true
+
 generate_feeds = true
 feed_filenames = ["atom.xml"]
 minify_html = true
 
 taxonomies = [{ name = "tags", feed = true }]
+
+[search]
+# Whether to include the title of the page/section in the index
+include_title = true
+# Whether to include the description of the page/section in the index
+include_description = false
+# Whether to include the path of the page/section in the index
+include_path = false
+# Whether to include the rendered content of the page/section in the index
+include_content = true
+# At which character to truncate the content to. Useful if you have a lot of pages and the index would
+# become too big to load on the site. Defaults to not being set.
+# truncate_content_length = 100
+# Wether to produce the search index as a javascript file or as a JSON file
+# Accepted value "elasticlunr_javascript" or "elasticlunr_json"
+index_format = "elasticlunr_json"
 
 [markdown]
 # Whether to do syntax highlighting
@@ -28,7 +46,7 @@ highlight_code = false
 
 [extra.papermod]
 title = "waifod"
-home_title = "#waifod"
+home_title = "Home"
 default_theme = "auto"
 theme = "dark"
 language_direction = "auto"
@@ -46,10 +64,12 @@ show_post_edit_button = false
 
 date_format = "%d-%m-%Y"
 
-home_content = "Welcome to my personal website!<br>I am a mathematician and a software engineer who tries to do stuff and get better at it."
+home_content = "Welcome to my personal website!<br>I am Matteo Durante, a mathematician and computer nerd who tries to do stuff and get better at it.<br>Besides technical challenges, I enjoy Latino dances, weightlifting, reading, anime and lots of other things."
 social_icons = [
   { url = "https://github.com/waifod", title = "GitHub", icon = "github" },
   { url = "https://www.linkedin.com/in/waifod/", title = "LinkedIn", icon = "linkedin" },
+  { url = "resources/job_cv.pdf", title = "cv", icon = "cv" },
+  { url = "mailto:waifod@pm.me", title = "email", icon = "email" },
   { url = "$BASE_URL/atom.xml", title = "RSS", icon = "rss" },
 ]
 
