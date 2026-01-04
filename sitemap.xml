@@ -15,6 +15,10 @@
         <lastmod>2024-10-17</lastmod>
     </url>
     <url>
+        <loc>https://waifod.dev/posts/learning-software-engineering/</loc>
+        <lastmod>2025-01-04</lastmod>
+    </url>
+    <url>
         <loc>https://waifod.dev/posts/lets-all-love-lain/</loc>
         <lastmod>2024-10-15</lastmod>
     </url>
@@ -31,6 +35,12 @@
         <loc>https://waifod.dev/tags/lain/</loc>
     </url>
     <url>
+        <loc>https://waifod.dev/tags/learning/</loc>
+    </url>
+    <url>
         <loc>https://waifod.dev/tags/resources/</loc>
+    </url>
+    <url>
+        <loc>https://waifod.dev/tags/software-engineering/</loc>
     </url>
 </urlset>
