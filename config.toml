@@ -3,7 +3,7 @@ base_url = "https://waifod.dev"
 
 # Site metadata
 title = "waifod"
-description = "Personal website and blog"
+description = "waifod's personal website and blog"
 
 # Theme configuration
 theme = "papermod"
