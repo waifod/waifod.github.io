@@ -1,5 +1,5 @@
 # The URL the site will be built for
-base_url = "https://waifod.dev"
+base_url = "https://waifod.github.io"
 
 # Site metadata
 title = "waifod"
