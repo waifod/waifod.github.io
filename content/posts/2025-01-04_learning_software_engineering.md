@@ -6,34 +6,73 @@ date = 2025-01-04
 tags = ["software-engineering", "learning", "resources"]
 +++
 
-A curated collection of resources for learning software engineering fundamentals and best practices. While some originate from the C++ ecosystem, the concepts apply broadly across languages and domains.
+A curated collection of resources for learning software engineering fundamentals and best practices.
 
 <!-- more -->
 
-## Core Concepts
+## Books
 
-### Data-Oriented Design
-Understanding how data flows through your system and optimizing for cache locality and memory access patterns.
+### Fundamentals
+- [Structure and Interpretation of Computer Programs](https://mitpress.mit.edu/sites/default/files/sicp/index.html) - Classic introduction to computational thinking
+- [Code: The Hidden Language of Computer Hardware and Software](https://www.codehiddenlanguage.com/) - Understanding computers from first principles
+- [Algorithms](https://algs4.cs.princeton.edu/) - Core algorithms and data structures
+- [Types and Programming Languages](https://www.cis.upenn.edu/~bcpierce/tapl/) - Type systems and formal semantics
 
-- [CppCon 2014: Mike Acton "Data-Oriented Design and C++"](https://www.youtube.com/watch?v=rX0ItVEVjHc) - Foundational talk on DoD principles
-- [Andrew Kelley Practical Data Oriented Design (DoD)](https://www.youtube.com/watch?v=IroPQ150F6c) - Practical applications beyond C++
+### Systems & Performance
+- [Operating Systems: Three Easy Pieces](https://pages.cs.wisc.edu/~remzi/OSTEP/) - OS fundamentals
+- [What Every Programmer Should Know About Memory](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf) - Memory hierarchies and performance
+- [Data-Oriented Design](https://www.dataorienteddesign.com/dodbook/) - Cache locality and memory optimization
+- [Programming in C](https://www.pearson.com/en-us/subject-catalog/p/programming-in-c/P200000003471) - Systems-level programming
+- [The Rust Programming Language](https://doc.rust-lang.org/book/) - Modern systems programming with memory safety
+
+### Architecture & Scale
+- [Designing Data-Intensive Applications](https://dataintensive.net/) - Distributed systems and data architecture
+- [Game Engine Architecture](https://www.gameenginebook.com/) - Real-time systems design patterns
+- [Software Engineering at Google](https://abseil.io/resources/swe-book) - Engineering practices at scale
+- [A Philosophy of Software Design](https://web.stanford.edu/~ouster/cgi-bin/book.php) - Principles for managing complexity
+
+### Language Implementation
+- [Compilers: Principles, Techniques, and Tools](https://suif.stanford.edu/dragonbook/) - The Dragon Book
+- [Crafting Interpreters](https://craftinginterpreters.com/) - Building programming languages from scratch
+
+### Operations
+- [Linux Administration](https://www.oreilly.com/library/view/linux-administration-a/9781491997013/) - Understanding Unix/Linux systems
+
+## Videos & Talks
+
+- [CppCon 2014: Mike Acton "Data-Oriented Design and C++"](https://www.youtube.com/watch?v=rX0ItVEVjHc)
+- [Andrew Kelley Practical Data Oriented Design](https://www.youtube.com/watch?v=IroPQ150F6c)
+- [Practical Optimizations](https://www.youtube.com/watch?v=NAVbI1HIzCE)
+- [Casey Muratori - The Big OOPs](https://www.youtube.com/watch?v=wo84LFzx5nI)
+- [Designing a Physics Engine in 5 minutes](https://www.youtube.com/watch?v=-_IspRG548E)
+
+## Articles & Papers
+
+### Performance & Memory
 - [The Lost Art of Structure Packing](https://www.catb.org/esr/structure-packing/) - Memory layout optimization
 - [Handles vs Pointers](https://floooh.github.io/2018/06/17/handles-vs-pointers.html) - Data structure design patterns
-- [Memory access is O(N^[1/3])](https://vitalik.eth.limo/general/2025/10/05/memory13.html) - Understanding real-world memory performance
+- [Memory access is O(N^[1/3])](https://vitalik.eth.limo/general/2025/10/05/memory13.html) - Real-world memory performance
+- [C++ Design Patterns for Low-latency Applications](https://arxiv.org/abs/2309.04259) - Performance-critical patterns
 
-### Performance & Optimization
-- [Practical Optimizations](https://www.youtube.com/watch?v=NAVbI1HIzCE) - Real-world optimization techniques
+## Courses & Practice
+
 - [Computer, Enhance!](https://www.computerenhance.com/) - Performance-aware programming course
-- [Compiler Explorer](https://godbolt.org/) - See what your code compiles to across languages and architectures
+- [Ray Tracing In One Weekend Series](https://raytracing.github.io/) - Build a ray tracer from scratch
+- [Rustlings](https://github.com/rust-lang/rustlings) - Small exercises to learn Rust
+
+## Tools
+
+- [Compiler Explorer](https://godbolt.org/) - See what your code compiles to
 - [RISC-V ISA Specification](https://riscv.org/technical/specifications/) - Understanding instruction set architecture
+- **gdb** - The GNU debugger
+- **valgrind** - Memory debugging and profiling
+- **clang-tidy** - Static analysis
+- **clang-format** - Code formatting
 
-### Software Design
-- [Casey Muratori - The Big OOPs: Anatomy of a Thirty-five-year Mistake – BSC 2025](https://www.youtube.com/watch?v=wo84LFzx5nI) - Critical analysis of OOP patterns
+## Blogs & Channels
 
-## Blogs & Continuous Learning
-
-### Technical Blogs
-- [Random ASCII](https://randomascii.wordpress.com/) - Deep dives into debugging and performance
+### Blogs
+- [Random ASCII](https://randomascii.wordpress.com/) - Debugging and performance deep dives
 - [The Old New Thing](https://devblogs.microsoft.com/oldnewthing/) - Windows internals and backwards compatibility
 
 ### YouTube Channels
@@ -41,21 +80,3 @@ Understanding how data flows through your system and optimizing for cache locali
 - [javidx9 - One Lone Coder](https://www.youtube.com/@javidx9) - Game development and graphics programming
 - [mCoding](https://www.youtube.com/@mCoding) - Programming concepts across languages
 - [CoffeeBeforeArch](https://www.youtube.com/@CoffeeBeforeArch) - Computer architecture and performance
-
-## Tools & Development
-
-### Essential Tools
-- **gdb** - The GNU debugger
-- **valgrind** - Memory debugging and profiling
-- **clang-tidy** - Static analysis
-- **clang-format** - Code formatting
-
-## Projects & Practice
-
-### Hands-On Learning
-- [Ray Tracing In One Weekend Series](https://raytracing.github.io/) - Build a ray tracer from scratch
-- [Designing a Physics Engine in 5 minutes](https://www.youtube.com/watch?v=-_IspRG548E) - Quick physics engine overview
-
-## Papers & Deep Reading
-
-- [C++ Design Patterns for Low-latency Applications Including High-frequency Trading](https://arxiv.org/abs/2309.04259) - Performance-critical design patterns
