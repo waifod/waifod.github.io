@@ -24,11 +24,11 @@ Understanding how data flows through your system and optimizing for cache locali
 ### Performance & Optimization
 - [Practical Optimizations](https://www.youtube.com/watch?v=NAVbI1HIzCE) - Real-world optimization techniques
 - [Computer, Enhance!](https://www.computerenhance.com/) - Performance-aware programming course
-- [Quick C++ Benchmark](https://quick-bench.com/) - Microbenchmarking tool
+- [Compiler Explorer](https://godbolt.org/) - See what your code compiles to across languages and architectures
+- [RISC-V ISA Specification](https://riscv.org/technical/specifications/) - Understanding instruction set architecture
 
 ### Software Design
 - [Casey Muratori - The Big OOPs: Anatomy of a Thirty-five-year Mistake – BSC 2025](https://www.youtube.com/watch?v=wo84LFzx5nI) - Critical analysis of OOP patterns
-- [C++ Software Design](https://www.oreilly.com/library/view/c-software-design/9781098113155/) - Design patterns and architecture
 
 ## Blogs & Continuous Learning
 
@@ -45,15 +45,10 @@ Understanding how data flows through your system and optimizing for cache locali
 ## Tools & Development
 
 ### Essential Tools
-- **Compiler Explorer** ([godbolt.org](https://godbolt.org/)) - See what your code compiles to
 - **gdb** - The GNU debugger
 - **valgrind** - Memory debugging and profiling
 - **clang-tidy** - Static analysis
 - **clang-format** - Code formatting
-
-### Build Systems
-- **cmake** - Cross-platform build system
-- [Modern CMake for C++](https://www.packtpub.com/product/modern-cmake-for-c/9781801070058) - Build system best practices
 
 ## Projects & Practice
 
@@ -64,7 +59,3 @@ Understanding how data flows through your system and optimizing for cache locali
 ## Papers & Deep Reading
 
 - [C++ Design Patterns for Low-latency Applications Including High-frequency Trading](https://arxiv.org/abs/2309.04259) - Performance-critical design patterns
-
----
-
-This list focuses on fundamental concepts that transcend specific languages: understanding hardware, optimizing for real-world constraints, and building maintainable systems. The best engineers understand both high-level abstractions and low-level details.
