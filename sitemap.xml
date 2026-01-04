@@ -1,30 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-        <loc>https://waifod.github.io/</loc>
+        <loc>https://waifod.dev/</loc>
     </url>
     <url>
-        <loc>https://waifod.github.io/posts/</loc>
+        <loc>https://waifod.dev/posts/</loc>
     </url>
     <url>
-        <loc>https://waifod.github.io/posts/lain-dump/</loc>
+        <loc>https://waifod.dev/posts/lain-dump/</loc>
         <lastmod>2024-10-15</lastmod>
     </url>
     <url>
-        <loc>https://waifod.github.io/posts/layer-1-weird/</loc>
+        <loc>https://waifod.dev/posts/layer-1-weird/</loc>
         <lastmod>2024-10-16</lastmod>
     </url>
     <url>
-        <loc>https://waifod.github.io/posts/layer-2-girls/</loc>
+        <loc>https://waifod.dev/posts/layer-2-girls/</loc>
         <lastmod>2024-10-17</lastmod>
     </url>
     <url>
-        <loc>https://waifod.github.io/posts/page/1/</loc>
+        <loc>https://waifod.dev/posts/page/1/</loc>
     </url>
     <url>
-        <loc>https://waifod.github.io/tags/</loc>
+        <loc>https://waifod.dev/tags/</loc>
     </url>
     <url>
-        <loc>https://waifod.github.io/tags/lain/</loc>
+        <loc>https://waifod.dev/tags/lain/</loc>
     </url>
 </urlset>
