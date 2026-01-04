@@ -25,6 +25,12 @@
         <loc>https://waifod.dev/tags/</loc>
     </url>
     <url>
+        <loc>https://waifod.dev/tags/anime/</loc>
+    </url>
+    <url>
         <loc>https://waifod.dev/tags/lain/</loc>
+    </url>
+    <url>
+        <loc>https://waifod.dev/tags/resources/</loc>
     </url>
 </urlset>
