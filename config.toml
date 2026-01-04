@@ -19,6 +19,7 @@ minify_html = true
 
 # Whether to generate RSS/Atom feeds
 generate_feeds = true
+feed_filenames = ["atom.xml"]
 
 # Taxonomies configuration
 taxonomies = [
