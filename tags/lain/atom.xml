@@ -2,11 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
     <title>waifod - lain</title>
     <subtitle>waifod&#x27;s personal website and blog</subtitle>
-    <link rel="self" type="application/atom+xml" href="https://waifod.dev/tags/lain/atom.xml"/>
-    <link rel="alternate" type="text/html" href="https://waifod.dev"/>
+    <link rel="self" type="application/atom+xml" href="https://waifod.github.io/tags/lain/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://waifod.github.io"/>
     <generator uri="https://www.getzola.org/">Zola</generator>
     <updated>2024-10-17T00:00:00+00:00</updated>
-    <id>https://waifod.dev/tags/lain/atom.xml</id>
+    <id>https://waifod.github.io/tags/lain/atom.xml</id>
     <entry xml:lang="en">
         <title>Layer 2: Girls</title>
         <published>2024-10-17T00:00:00+00:00</published>
@@ -20,8 +20,8 @@
           </name>
         </author>
         
-        <link rel="alternate" type="text/html" href="https://waifod.dev/posts/layer-2-girls/"/>
-        <id>https://waifod.dev/posts/layer-2-girls/</id>
+        <link rel="alternate" type="text/html" href="https://waifod.github.io/posts/layer-2-girls/"/>
+        <id>https://waifod.github.io/posts/layer-2-girls/</id>
         
         <summary type="html">&lt;p&gt;Another sample blogpost, still Lain-themed.&lt;&#x2F;p&gt;
 </summary>
@@ -40,8 +40,8 @@
           </name>
         </author>
         
-        <link rel="alternate" type="text/html" href="https://waifod.dev/posts/layer-1-weird/"/>
-        <id>https://waifod.dev/posts/layer-1-weird/</id>
+        <link rel="alternate" type="text/html" href="https://waifod.github.io/posts/layer-1-weird/"/>
+        <id>https://waifod.github.io/posts/layer-1-weird/</id>
         
         <summary type="html">&lt;p&gt;Sample blogpost, Lain-themed.&lt;&#x2F;p&gt;
 </summary>
@@ -60,8 +60,8 @@
           </name>
         </author>
         
-        <link rel="alternate" type="text/html" href="https://waifod.dev/posts/lain-dump/"/>
-        <id>https://waifod.dev/posts/lain-dump/</id>
+        <link rel="alternate" type="text/html" href="https://waifod.github.io/posts/lain-dump/"/>
+        <id>https://waifod.github.io/posts/lain-dump/</id>
         
         <summary type="html">&lt;p&gt;A simple dump of Lain-related websites and resources, to help us better love her.&lt;&#x2F;p&gt;
 </summary>
