@@ -24,6 +24,7 @@ A curated collection of resources for learning software engineering fundamentals
 - [Data-Oriented Design](https://www.dataorienteddesign.com/dodbook/) - Cache locality and memory optimization
 - [Programming in C](https://www.pearson.com/en-us/subject-catalog/p/programming-in-c/P200000003471) - Systems-level programming
 - [The Rust Programming Language](https://doc.rust-lang.org/book/) - Modern systems programming with memory safety
+- [RISC-V ISA Specification](https://riscv.org/technical/specifications/) - Understanding instruction set architecture
 
 ### Architecture & Scale
 - [Designing Data-Intensive Applications](https://dataintensive.net/) - Distributed systems and data architecture
@@ -63,7 +64,6 @@ A curated collection of resources for learning software engineering fundamentals
 ## Tools
 
 - [Compiler Explorer](https://godbolt.org/) - See what your code compiles to
-- [RISC-V ISA Specification](https://riscv.org/technical/specifications/) - Understanding instruction set architecture
 - **gdb** - The GNU debugger
 - **valgrind** - Memory debugging and profiling
 - **clang-tidy** - Static analysis
