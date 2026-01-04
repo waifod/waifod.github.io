@@ -61,6 +61,8 @@ I am Matteo Durante, a mathematician and computer nerd who tries to do stuff and
 
 Besides technical challenges, I enjoy Latino dances, weightlifting, reading, anime and lots of other things.
 """
+show_recent_posts = true
+recent_posts_count = 3
 
 # Navigation menu
 navigation = [
