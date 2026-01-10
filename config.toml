@@ -6,7 +6,7 @@ title = "waifod"
 description = "waifod's personal website and blog"
 
 # Theme configuration
-theme = "papermod"
+theme = "terminus"
 
 # Whether to automatically compile all Sass files in the sass directory
 compile_sass = true
@@ -32,53 +32,5 @@ taxonomies = [
 highlight_code = true
 
 [extra]
-# PaperMod theme configuration
-[extra.papermod]
-title = "waifod"
-default_theme = "auto"
-theme = "light"
-language_direction = "auto"
-keywords = []
-enable_search = false
-show_theme_toggle = true
-show_scroll_to_top = true
-show_code_copy_buttons = true
-show_reading_time = true
-show_word_count = false
-show_post_nav_links = true
-show_post_meta = true
-default_toc_open = false
-show_archive_year_count = true
-show_archive_month_count = true
-date_format = "%Y-%m-%d"
-
-# Home page configuration
-home_title = "Home"
-home_content = """
-## Welcome
-
-I am Matteo Durante, a mathematician and computer nerd who tries to do stuff and get better at it.
-
-Besides technical challenges, I enjoy Latino dances, weightlifting, reading, anime and lots of other things.
-"""
-show_recent_posts = true
-recent_posts_count = 3
-
-# Navigation menu
-navigation = [
-    { url = "$BASE_URL/", title = "Home" },
-    { url = "$BASE_URL/posts", title = "Posts" },
-    { url = "$BASE_URL/tags", title = "Tags" },
-]
-
-# Social icons
-social_icons = [
-    { name = "github", url = "https://github.com/waifod", title = "GitHub", icon = "github" },
-    { name = "linkedin", url = "https://www.linkedin.com/in/waifod/", title = "LinkedIn", icon = "linkedin" },
-    { name = "email", url = "mailto:waifod@pm.me", title = "Email", icon = "email" },
-    { name = "cv", url = "/cv.pdf", title = "CV", icon = "cv" },
-]
-
-# Author information
-[extra.author]
-name = "Matteo Durante"
+# Terminus theme uses minimal configuration
+# Social icons and other customizations will be added later
