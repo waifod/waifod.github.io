@@ -10,6 +10,8 @@ A curated collection of resources for learning software engineering fundamentals
 
 <!-- more -->
 
+---
+
 ## Books
 
 ### Fundamentals
@@ -42,6 +44,8 @@ A curated collection of resources for learning software engineering fundamentals
 ### Operations
 - [The Linux Command Line](https://linuxcommand.org/tlcl.php) - Understanding Unix/Linux systems
 
+---
+
 ## Videos & Talks
 
 - [CppCon 2014: Mike Acton "Data-Oriented Design and C++"](https://www.youtube.com/watch?v=rX0ItVEVjHc)
@@ -51,6 +55,8 @@ A curated collection of resources for learning software engineering fundamentals
 - [Casey Muratori - The Big OOPs](https://www.youtube.com/watch?v=wo84LFzx5nI)
 - [Designing a Physics Engine in 5 minutes](https://www.youtube.com/watch?v=-_IspRG548E)
 
+---
+
 ## Articles & Papers
 
 ### Performance & Memory
@@ -59,11 +65,15 @@ A curated collection of resources for learning software engineering fundamentals
 - [Memory access is O(N^[1/3])](https://vitalik.eth.limo/general/2025/10/05/memory13.html) - Real-world memory performance
 - [C++ Design Patterns for Low-latency Applications](https://arxiv.org/abs/2309.04259) - Performance-critical patterns
 
+---
+
 ## Courses & Practice
 
 - [Computer, Enhance!](https://www.computerenhance.com/) - Performance-aware programming course
 - [Ray Tracing In One Weekend Series](https://raytracing.github.io/) - Build a ray tracer from scratch
 - [Rustlings](https://github.com/rust-lang/rustlings) - Small exercises to learn Rust
+
+---
 
 ## Tools
 
@@ -72,6 +82,8 @@ A curated collection of resources for learning software engineering fundamentals
 - **valgrind** - Memory debugging and profiling
 - **clang-tidy** - Static analysis
 - **clang-format** - Code formatting
+
+---
 
 ## Blogs & Channels
 
