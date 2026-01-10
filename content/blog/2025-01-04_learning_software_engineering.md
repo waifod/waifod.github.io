@@ -51,12 +51,12 @@ A curated collection of resources for learning software engineering fundamentals
 
 ## Videos & Talks
 
-- [From Blinky to Bootloader: Bare Metal Programming Series](https://www.youtube.com/playlist?list=PLP29wDx6QmW7HaCrRydOnxcy8QmW0SNdQ)
-- [CppCon 2014: Mike Acton "Data-Oriented Design and C++"](https://www.youtube.com/watch?v=rX0ItVEVjHc)
-- [code::dive conference 2014 - Scott Meyers: Cpu Caches and Why You Care](https://www.youtube.com/watch?v=WDIkqP4JbkE)
-- [Andrew Kelley Practical Data Oriented Design](https://www.youtube.com/watch?v=IroPQ150F6c)
-- [Practical Optimizations](https://www.youtube.com/watch?v=NAVbI1HIzCE)
-- [Casey Muratori - The Big OOPs](https://www.youtube.com/watch?v=wo84LFzx5nI)
+- [From Blinky to Bootloader: Bare Metal Programming Series](https://www.youtube.com/playlist?list=PLP29wDx6QmW7HaCrRydOnxcy8QmW0SNdQ) - ARM Cortex-M embedded development
+- [Data-Oriented Design and C++ - Mike Acton (CppCon 2014)](https://www.youtube.com/watch?v=rX0ItVEVjHc)
+- [CPU Caches and Why You Care - Scott Meyers (code::dive 2014)](https://www.youtube.com/watch?v=WDIkqP4JbkE)
+- [A Practical Guide to Applying Data Oriented Design - Andrew Kelley](https://www.youtube.com/watch?v=IroPQ150F6c)
+- [Practical Optimizations - Arseny Kapoulkine](https://www.youtube.com/watch?v=NAVbI1HIzCE)
+- [The Big OOPs: Anatomy of a Thirty-five-year Mistake - Casey Muratori (BSC 2025)](https://www.youtube.com/watch?v=wo84LFzx5nI)
 - [Designing a Physics Engine in 5 minutes](https://www.youtube.com/watch?v=-_IspRG548E)
 
 ---
