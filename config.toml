@@ -2,8 +2,9 @@
 base_url = "https://waifod.dev"
 
 # Site metadata
+author = "Matteo Durante"
 title = "waifod"
-description = "waifod's personal website and blog"
+description = "Mathematics, software, and other things"
 
 # Theme configuration
 theme = "terminus"
