@@ -33,8 +33,7 @@ taxonomies = [
 highlight_code = true
 
 [extra]
-# Terminus theme uses minimal configuration
-# Social icons and other customizations will be added later
+favicon = "favicon.svg"
 
 # Navigation menu
 main_menu = [
