@@ -39,6 +39,7 @@ highlight_code = true
 main_menu = [
     { name = "blog", url = "blog", trailing_slash = true },
     { name = "tags", url = "tags", trailing_slash = true },
+    { name = "github", url = "https://github.com/waifod", new_tab = true },
 ]
 
 # Social links
