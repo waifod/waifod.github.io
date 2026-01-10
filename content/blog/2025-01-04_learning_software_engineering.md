@@ -67,6 +67,7 @@ A curated collection of resources for learning software engineering fundamentals
 ## Articles & Papers
 
 ### Performance & Memory
+- [Borrow checking, RC, GC, and the Eleven (!) Other Memory Safety Approaches](https://verdagon.dev/grimoire/grimoire)
 - [Gallery of Processor Cache Effects](https://igoro.com/archive/gallery-of-processor-cache-effects/)
 - [The Lost Art of Structure Packing](https://www.catb.org/esr/structure-packing/) - Memory layout optimization
 - [Handles vs Pointers](https://floooh.github.io/2018/06/17/handles-vs-pointers.html) - Memory indirection strategies
