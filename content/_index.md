@@ -1,4 +1,7 @@
 +++
 title = "Home"
-paginate_by = 5
+
+[extra]
+section_path = "posts/_index.md"
+max_posts = 5
 +++
