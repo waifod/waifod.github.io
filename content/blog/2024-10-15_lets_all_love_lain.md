@@ -6,7 +6,7 @@ date = 2024-10-15
 tags = ["lain", "anime", "resources"]
 +++
 
-*Present day, present time.*
+> *Present day, present time.*
 
 A curated collection of Lain-related websites, resources, and communities. Serial Experiments Lain remains one of the most influential anime series exploring themes of identity, consciousness, and the intersection of technology and humanity.
 
