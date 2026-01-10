@@ -34,13 +34,13 @@ I haven't used all of these resources. Some are listed based on recommendations 
 - [What Every Programmer Should Know About Memory](https://people.freebsd.org/~lstewart/articles/cpumemory.pdf) - Memory hierarchies and performance
 - [Data-Oriented Design](https://www.dataorienteddesign.com/dodbook/) - Cache locality and memory optimization
 - [Database Internals](https://www.databass.dev/) - How databases work under the hood
-- [Programming in C](https://www.pearson.com/en-us/subject-catalog/p/programming-in-c/P200000003471) - Systems-level programming
+- [Programming in C](https://www.pearson.com/en-us/subject-catalog/p/programming-in-c/P200000003471)
 - [The Rust Programming Language](https://doc.rust-lang.org/book/) - Modern systems programming with memory safety
-- [RISC-V ISA Specification](https://riscv.org/technical/specifications/) - Understanding instruction set architecture
+- [RISC-V ISA Specification](https://riscv.org/technical/specifications/)
 
 **Distributed Systems & Design**
 - [Designing Data-Intensive Applications](https://dataintensive.net/) - Distributed systems and data architecture
-- [Game Engine Architecture](https://www.gameenginebook.com/) - Real-time systems design patterns
+- [Game Engine Architecture](https://www.gameenginebook.com/)
 - [Software Engineering at Google](https://abseil.io/resources/swe-book) - Engineering practices at scale
 - [A Philosophy of Software Design](https://web.stanford.edu/~ouster/cgi-bin/book.php) - Principles for managing complexity
 
@@ -68,8 +68,9 @@ I haven't used all of these resources. Some are listed based on recommendations 
 ## Articles & Papers
 
 ### Performance & Memory
+- [Gallery of Processor Cache Effects](https://igoro.com/archive/gallery-of-processor-cache-effects/)
 - [The Lost Art of Structure Packing](https://www.catb.org/esr/structure-packing/) - Memory layout optimization
-- [Handles vs Pointers](https://floooh.github.io/2018/06/17/handles-vs-pointers.html) - Data structure design patterns
+- [Handles vs Pointers](https://floooh.github.io/2018/06/17/handles-vs-pointers.html) - Memory indirection strategies
 - [Memory access is O(N^[1/3])](https://vitalik.eth.limo/general/2025/10/05/memory13.html) - Real-world memory performance
 - [C++ Design Patterns for Low-latency Applications](https://arxiv.org/abs/2309.04259) - Performance-critical patterns
 
@@ -105,6 +106,7 @@ I haven't used all of these resources. Some are listed based on recommendations 
 
 ### YouTube Channels
 - [Bisqwit](https://www.youtube.com/@Bisqwit) - Retro programming and algorithms
+- [CoffeeBeforeArch](https://www.youtube.com/@CoffeeBeforeArch) - Computer architecture and performance
 - [javidx9 - One Lone Coder](https://www.youtube.com/@javidx9) - Game development and graphics programming
 - [mCoding](https://www.youtube.com/@mCoding) - Programming concepts across languages
-- [CoffeeBeforeArch](https://www.youtube.com/@CoffeeBeforeArch) - Computer architecture and performance
+- [Tsoding](https://www.youtube.com/@Tsoding) - Low-level programming and language implementation
