@@ -13,9 +13,8 @@ A curated collection of resources for learning software engineering fundamentals
 
 <!-- more -->
 
-{% alert(type="warning", title="Disclaimer") %}
-I haven't used all of these resources. Some are listed based on recommendations I've received, for my own future reference.
-{% end %}
+> [!WARNING]
+> I haven't used all of these resources. Some are listed based on recommendations I've received, for my own future reference.
 
 ---
 
