@@ -37,7 +37,7 @@ bottom_footnotes = true
 
 # When set to "true", emoji aliases translated to their corresponding
 # Unicode emoji equivalent in the rendered Markdown files. (e.g.: :smile: => 😄)
-render_emoji = false
+render_emoji = true
 
 # When set to "true", support for GitHub-style alerts, a.k.a. callouts or admonitions, is enabled in the Markdown parser.
 github_alerts = true
