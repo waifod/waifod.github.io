@@ -71,6 +71,7 @@ A curated collection of resources for learning software engineering fundamentals
 - [The Lost Art of Structure Packing](https://www.catb.org/esr/structure-packing/) - Memory layout optimization
 - [Handles vs Pointers](https://floooh.github.io/2018/06/17/handles-vs-pointers.html) - Memory indirection strategies
 - [Memory access is O(N^[1/3])](https://vitalik.eth.limo/general/2025/10/05/memory13.html) - Real-world memory performance
+- [Untangling Lifetimes: The Arena Allocator](https://www.rfleury.com/p/untangling-lifetimes-the-arena-allocator) - Performant dynamic manual memory management in C
 - [C++ Design Patterns for Low-latency Applications](https://arxiv.org/abs/2309.04259) - Performance-critical patterns
 
 ### Networking
