@@ -4,6 +4,9 @@ date = 2025-01-04
 
 [taxonomies]
 tags = ["learning", "resources", "software-engineering"]
+
+[extra]
+toc = true
 +++
 
 A curated collection of resources for learning software engineering fundamentals and best practices.
@@ -48,6 +51,7 @@ A curated collection of resources for learning software engineering fundamentals
 
 ## Videos & Talks
 
+- [From Blinky to Bootloader: Bare Metal Programming Series](https://www.youtube.com/playlist?list=PLP29wDx6QmW7HaCrRydOnxcy8QmW0SNdQ)
 - [CppCon 2014: Mike Acton "Data-Oriented Design and C++"](https://www.youtube.com/watch?v=rX0ItVEVjHc)
 - [code::dive conference 2014 - Scott Meyers: Cpu Caches and Why You Care](https://www.youtube.com/watch?v=WDIkqP4JbkE)
 - [Andrew Kelley Practical Data Oriented Design](https://www.youtube.com/watch?v=IroPQ150F6c)
@@ -64,6 +68,9 @@ A curated collection of resources for learning software engineering fundamentals
 - [Handles vs Pointers](https://floooh.github.io/2018/06/17/handles-vs-pointers.html) - Data structure design patterns
 - [Memory access is O(N^[1/3])](https://vitalik.eth.limo/general/2025/10/05/memory13.html) - Real-world memory performance
 - [C++ Design Patterns for Low-latency Applications](https://arxiv.org/abs/2309.04259) - Performance-critical patterns
+
+### Networking
+- [Linux IP Networking](https://www.cs.unh.edu/cnrg/people/gherrin/linux-net.html) - Guide to the Linux protocol stack implementation
 
 ---
 
