@@ -1,7 +1,9 @@
 +++
 title = "Home"
-
-[extra]
-section_path = "posts/_index.md"
-max_posts = 5
 +++
+
+## Welcome
+
+I am Matteo Durante, a mathematician and computer nerd who tries to do stuff and get better at it.
+
+Besides technical challenges, I enjoy Latino dances, weightlifting, reading, anime and lots of other things.

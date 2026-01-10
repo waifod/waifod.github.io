@@ -34,3 +34,16 @@ highlight_code = true
 [extra]
 # Terminus theme uses minimal configuration
 # Social icons and other customizations will be added later
+
+# Navigation menu
+main_menu = [
+    { name = "posts", url = "posts", trailing_slash = true },
+    { name = "tags", url = "tags", trailing_slash = true },
+]
+
+# Social links
+socials = [
+    { name = "github", url = "https://github.com/waifod" },
+    { name = "linkedin", url = "https://www.linkedin.com/in/waifod/" },
+    { name = "email", url = "mailto:waifod@pm.me" },
+]
