@@ -13,6 +13,10 @@ A curated collection of resources for learning software engineering fundamentals
 
 <!-- more -->
 
+{% alert(type="warning", title="Disclaimer") %}
+I haven't used all of these resources. Some are listed based on recommendations I've received, for my own future reference.
+{% end %}
+
 ---
 
 ## Books
@@ -45,7 +49,7 @@ A curated collection of resources for learning software engineering fundamentals
 - [Crafting Interpreters](https://craftinginterpreters.com/) - Building programming languages from scratch
 
 ### Operations
-- [The Linux Command Line](https://linuxcommand.org/tlcl.php) - Understanding Unix/Linux systems
+- [The Linux Command Line](https://linuxcommand.org/tlcl.php) - Shell scripting and command-line usage
 
 ---
 
