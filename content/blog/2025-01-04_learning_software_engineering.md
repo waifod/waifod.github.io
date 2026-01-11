@@ -1,5 +1,5 @@
 +++
-title = "Learning Software Engineering"
+title = "Learning software engineering"
 date = 2025-01-04
 
 [taxonomies]
