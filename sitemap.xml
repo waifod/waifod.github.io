@@ -18,6 +18,10 @@
         <loc>https://waifod.dev/blog/page/1/</loc>
     </url>
     <url>
+        <loc>https://waifod.dev/blog/software-i-like/</loc>
+        <lastmod>2025-01-11</lastmod>
+    </url>
+    <url>
         <loc>https://waifod.dev/tags/</loc>
     </url>
     <url>
@@ -34,5 +38,11 @@
     </url>
     <url>
         <loc>https://waifod.dev/tags/software-engineering/</loc>
+    </url>
+    <url>
+        <loc>https://waifod.dev/tags/software/</loc>
+    </url>
+    <url>
+        <loc>https://waifod.dev/tags/tools/</loc>
     </url>
 </urlset>
