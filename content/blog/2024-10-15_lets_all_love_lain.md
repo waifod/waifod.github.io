@@ -6,7 +6,7 @@ date = 2024-10-15
 tags = ["anime", "lain", "resources"]
 +++
 
-A curated collection of Lain-related websites, resources, and communities.
+A curated collection of Lain-related websites, resources, and communities. You don't seem to understand.
 
 <!-- more -->
 

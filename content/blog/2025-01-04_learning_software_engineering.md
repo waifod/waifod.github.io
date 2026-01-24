@@ -9,7 +9,7 @@ tags = ["learning", "resources", "software-engineering"]
 toc = true
 +++
 
-A curated collection of resources for learning software engineering fundamentals and best practices.
+Resources I've bookmarked for learning software engineering. Some I've actually used.
 
 <!-- more -->
 

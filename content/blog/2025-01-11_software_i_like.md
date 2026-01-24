@@ -6,7 +6,7 @@ date = 2025-01-11
 tags = ["software", "tools"]
 +++
 
-A collection of technologies, tools, and software I enjoy using.
+Tools and software I actually enjoy using. Yes, they exist.
 
 <!-- more -->
 
