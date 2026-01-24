@@ -331,14 +331,20 @@ The tradeoff is that you lose flexibility at call sites. With `Box<dyn Trait>` d
 
 In practice, this C++-style wrapper pattern is rare in Rust. The trait system's flexibility and non-intrusiveness means `Box<dyn Trait>` is usually good enough, and the extra indirection of a wrapper struct doesn't buy you much.
 
+## Where C++ has the edge
+
+Rust's built-in type erasure is convenient, but C++'s manual approach offers more flexibility in certain scenarios:
+
+1. **Small buffer optimization**: `std::function` typically stores small callables inline, avoiding heap allocation, while Rust's `Box<dyn Trait>` always heap-allocates. SBO is possible in Rust, but requires extra work (crates like `smallbox` or manual unsafe code).
+
+2. **Object safety**: Rust trait objects have restrictions. Traits with generic methods or `Self` in return position can't be made into `dyn Trait`. C++ templates don't have this limitation since you control the `Concept` interface.
+
+3. **Multiple unrelated methods**: In C++, you can put whatever methods you want in the `Concept` class. Rust's `dyn TraitA + TraitB` only works when `TraitB` is an auto trait like `Send` or `Sync`.
+
+4. **Custom storage**: C++'s manual approach gives you full control over how the erased type is stored. You can use arena allocation, custom allocators, or other memory layouts. Rust can do this too, but it's not simpler than C++.
+
 ## Conclusion
 
-C++ and Rust both support type erasure, but the experience is different:
-
-**C++**: You build it yourself using the Concept/Model pattern. It works, but requires understanding how to combine templates and inheritance. This reflects the language's history: type erasure emerged as a pattern the community discovered over decades to work around limitations in the inheritance model.
-
-**Rust**: Trait objects are built into the language. The same trait works for both static (`impl Trait`) and dynamic (`dyn Trait`) dispatch. Traits were designed from the start with both use cases in mind.
-
-Both languages give you the same level of control if you need it. Rust just makes the common case simpler.
+C++ and Rust both support type erasure, but with different tradeoffs. Rust's `dyn Trait` makes the common case trivial: no boilerplate, non-intrusive traits, and the compiler handles the vtable. C++ requires manual implementation but offers more control when you need SBO, custom storage, or want to bypass object safety restrictions.
 
 Code samples available on [GitHub](https://github.com/waifod/blog_code_samples/tree/main/type_erasure_cpp_rust).
