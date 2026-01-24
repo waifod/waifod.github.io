@@ -340,3 +340,5 @@ C++ and Rust both support type erasure, but the experience is different:
 **Rust**: Trait objects are built into the language. The same trait works for both static (`impl Trait`) and dynamic (`dyn Trait`) dispatch. Traits were designed from the start with both use cases in mind.
 
 Both languages give you the same level of control if you need it. Rust just makes the common case simpler.
+
+Code samples available on [GitHub](https://github.com/waifod/blog_code_samples/tree/main/type_erasure_cpp_rust).
