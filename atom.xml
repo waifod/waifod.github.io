@@ -23,7 +23,7 @@
         <link rel="alternate" type="text/html" href="https://waifod.dev/blog/type-erasure-cpp-rust/"/>
         <id>https://waifod.dev/blog/type-erasure-cpp-rust/</id>
         
-        <summary type="html">&lt;p&gt;An exploration of type erasure in C++ and why Rust&#x27;s trait system makes it largely unnecessary.&lt;&#x2F;p&gt;</summary>
+        <summary type="html">&lt;p&gt;In which I teach myself C++ type erasure, and discover why Rust&#x27;s trait system makes most of it unnecessary.&lt;&#x2F;p&gt;</summary>
         
     </entry>
     <entry xml:lang="en">
