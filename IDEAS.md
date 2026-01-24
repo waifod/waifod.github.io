@@ -4,11 +4,14 @@
 
 1. **CRTP and type erasure** - Translating C++ idioms to Rust
 2. **Static vs dynamic polymorphism** - vtables, devirtualization, CRTP
-3. **The compilation process** - Translation units, LTO, cross-TU optimization
-4. **False sharing** - First benchmarking exercise
-5. **Synchronization primitives** - Spinlocks, atomics, mutexes, futexes
-6. **LRU cache implementations** - Cache-aware data structure design
-7. **Ring buffers** - Atomics, memory ordering, cache awareness
+3. **The compilation process** - Translation units, LTO, incremental compilation
+4. **CPU caches** - L1/L2/L3 hierarchy, cache lines, associativity
+5. **TLB and virtual memory** - Page tables, TLB misses, huge pages
+6. **False sharing** - Cache line contention, benchmarking
+7. **Spin-lock optimization** - Test-and-set variants, backoff, ticket locks
+8. **Synchronization primitives** - Atomics, mutexes, futexes
+9. **LRU cache implementations** - Cache-aware data structure design
+10. **Ring buffers** - Lock-free SPSC, memory ordering, cache awareness
 
 ---
 
@@ -97,6 +100,15 @@ References:
 - [ultra-low-latency-ring-buffer](https://github.com/cale-cmd/ultra-low-latency-ring-buffer)
 - [1024cores.net](https://www.1024cores.net/home/lock-free-algorithms/queues) - Dmitry Vyukov's lock-free queues
 - [Mara Bos - Rust Atomics and Locks](https://marabos.nl/atomics/)
+
+---
+
+## Ideas from david-alvarez-rosa/personal-website
+
+- **Exploring CPU caches** - L1/L2/L3 hierarchy, cache lines, associativity, write policies
+- **Translation Lookaside Buffer (TLB)** - Virtual memory, page tables, TLB misses, huge pages
+- **Spin-lock optimization** - Test-and-set, test-and-test-and-set, exponential backoff, ticket locks
+- **Incremental compilation** - How compilers avoid recompiling unchanged code
 
 ---
 
