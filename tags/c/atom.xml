@@ -20,6 +20,25 @@
           </name>
         </author>
         
+        <link rel="alternate" type="text/html" href="https://waifod.dev/blog/polymorphism-type-erasure/"/>
+        <id>https://waifod.dev/blog/polymorphism-type-erasure/</id>
+        
+        <summary type="html">&lt;p&gt;In which I teach myself C++ type erasure, and discover why Rust&#x27;s trait system makes most of it unnecessary.&lt;&#x2F;p&gt;</summary>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Polymorphism in C++ and Rust: type erasure</title>
+        <published>2026-01-24T00:00:00+00:00</published>
+        <updated>2026-01-24T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Matteo Durante
+            
+          </name>
+        </author>
+        
         <link rel="alternate" type="text/html" href="https://waifod.dev/blog/type-erasure-cpp-rust/"/>
         <id>https://waifod.dev/blog/type-erasure-cpp-rust/</id>
         

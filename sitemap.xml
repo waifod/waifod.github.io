@@ -18,6 +18,10 @@
         <loc>https://waifod.dev/blog/page/1/</loc>
     </url>
     <url>
+        <loc>https://waifod.dev/blog/polymorphism-type-erasure/</loc>
+        <lastmod>2026-01-24</lastmod>
+    </url>
+    <url>
         <loc>https://waifod.dev/blog/software-i-like/</loc>
         <lastmod>2025-01-11</lastmod>
     </url>
