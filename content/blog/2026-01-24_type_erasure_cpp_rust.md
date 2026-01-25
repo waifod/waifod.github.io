@@ -1,6 +1,6 @@
 +++
 title = "Polymorphism in C++ and Rust: type erasure"
-date = 2025-01-24
+date = 2026-01-24
 
 [taxonomies]
 tags = ["c++", "rust", "programming", "patterns"]
@@ -24,22 +24,19 @@ C++ with virtual functions:
 #include <vector>
 #include <memory>
 
-class Shape {
-public:
+struct Shape {
     virtual ~Shape() = default;
     virtual double area() const = 0;
 };
 
-class Circle : public Shape {
+struct Circle : Shape {
     double radius_;
-public:
     Circle(double r) : radius_(r) {}
     double area() const override { return M_PI * radius_ * radius_; }
 };
 
-class Square : public Shape {
+struct Square : Shape {
     double side_;
-public:
     Square(double s) : side_(s) {}
     double area() const override { return side_ * side_; }
 };
@@ -90,8 +87,8 @@ fn main() {
 
 This works, but it has limitations:
 
-1. Pointer semantics: you must use pointers/references (`std::unique_ptr`, `Box`) in your API
-2. Intrusive: types must inherit from the base class (C++) or implement the trait (Rust)
+1. Pointer semantics - you must use pointers/references (`std::unique_ptr`, `Box`) in your API;
+2. Intrusive - types must inherit from the base class (C++) or implement the trait (Rust).
 
 What if you want polymorphism with value semantics at the API level?
 
@@ -187,10 +184,10 @@ int main() {
 ```
 
 Notice:
-- we pass by value, not by pointer
-- each callable has a different type
-- no inheritance required
-- the concrete type is "erased" behind `std::function`
+- we pass by value, not by pointer;
+- each callable has a different type;
+- no inheritance required;
+- the concrete type is "erased" behind `std::function`.
 
 This is type erasure: hiding the concrete type behind a uniform interface while maintaining *value semantics*.
 
@@ -212,7 +209,7 @@ C++ doesn't provide type erasure as a language feature, and instead you implemen
 #include <iostream>
 #include <vector>
 
-class Shape {
+struct Shape {
     struct Concept {
         virtual ~Concept() = default;
         virtual double area() const = 0;
@@ -227,7 +224,6 @@ class Shape {
     
     std::unique_ptr<Concept> object;
 
-public:
     template<typename T>
     Shape(T obj) : object(std::make_unique<Model<T>>(std::move(obj))) {}
     
@@ -323,9 +319,9 @@ fn main() {
 ```
 
 Now you have `Vec<Shape>` instead of `Vec<Box<dyn Shape>>`. This gives you:
-- a cleaner public API
-- the ability to add methods to `Shape` that aren't on the trait
-- encapsulation: the `Box` is an implementation detail you could change later
+- a cleaner public API;
+- the ability to add methods to `Shape` that aren't on the trait;
+- encapsulation - the `Box` is an implementation detail you could change later.
 
 The tradeoff is that you lose flexibility at call sites. With `Box<dyn Trait>` directly, callers can choose between `Box`, `Rc`, or references depending on their needs.
 
@@ -335,13 +331,13 @@ In practice, this C++-style wrapper pattern is rare in Rust. The trait system's 
 
 Rust's built-in type erasure is convenient, but C++'s manual approach offers more flexibility in certain scenarios:
 
-1. **Small buffer optimization**: `std::function` typically stores small callables inline, avoiding heap allocation, while Rust's `Box<dyn Trait>` always heap-allocates. SBO is possible in Rust, but requires extra work (crates like `smallbox` or manual unsafe code).
+1. **Small buffer optimization** - C++'s `std::function` stores small callables inline, avoiding heap allocation (see Raymond Chen's [explanation of how this works](https://devblogs.microsoft.com/oldnewthing/20200514-00/?p=103749)). Rust's `Box<dyn Trait>` always heap-allocates. That said, if you're implementing custom type erasure (as shown in this post), you have to implement SBO yourself in both languages. Neither makes it easy. C++ just ships with it for the callable case.
 
-2. **Object safety**: Rust trait objects have restrictions. Traits with generic methods or `Self` in return position can't be made into `dyn Trait`. C++ templates don't have this limitation since you control the `Concept` interface.
+2. **Object safety** - Rust trait objects have restrictions. Traits with generic methods, methods returning `Self`, or methods that take `self` by value can't be made into `dyn Trait` (the compiler can't know the concrete type's size at runtime). C++ templates don't have this limitation since you control the `Concept` interface.
 
-3. **Multiple unrelated methods**: In C++, you can put whatever methods you want in the `Concept` class. Rust's `dyn TraitA + TraitB` only works when `TraitB` is an auto trait like `Send` or `Sync`.
+3. **Multiple unrelated methods** - in C++, you can put whatever methods you want in the `Concept` class. Rust's `dyn TraitA + TraitB` only works when `TraitB` is an auto trait like `Send` or `Sync`.
 
-4. **Custom storage**: C++'s manual approach gives you full control over how the erased type is stored. You can use arena allocation, custom allocators, or other memory layouts. Rust can do this too, but it's not simpler than C++.
+4. **Custom storage** - C++'s manual approach gives you full control over how the erased type is stored. You can use arena allocation, custom allocators, or other memory layouts. Rust can do this too, but it's not simpler than C++.
 
 ## Conclusion
 
