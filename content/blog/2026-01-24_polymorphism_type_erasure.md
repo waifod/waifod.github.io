@@ -333,11 +333,9 @@ Rust's built-in type erasure is convenient, but C++'s manual approach offers mor
 
 1. **Small buffer optimization** - C++'s `std::function` stores small callables inline, avoiding heap allocation (see Raymond Chen's [explanation of how this works](https://devblogs.microsoft.com/oldnewthing/20200514-00/?p=103749)). Rust's `Box<dyn Trait>` always heap-allocates. That said, if you're implementing custom type erasure (as shown in this post), you have to implement SBO yourself in both languages. Neither makes it easy. C++ just ships with it for the callable case.
 
-2. **Object safety** - Rust trait objects have restrictions. Traits with generic methods, methods returning `Self`, or methods that take `self` by value can't be made into `dyn Trait` (the compiler can't know the concrete type's size at runtime). C++ templates don't have this limitation since you control the `Concept` interface.
+2. **More flexible interface definition** - Rust trait objects have restrictions: traits with generic methods, methods returning `Self`, or methods taking `self` by value aren't object-safe. You also can't combine arbitrary traits - `dyn TraitA + TraitB` only works when `TraitB` is an auto trait like `Send` or `Sync`. C++ templates don't have these limitations since you control the `Concept` interface directly.
 
-3. **Multiple unrelated methods** - in C++, you can put whatever methods you want in the `Concept` class. Rust's `dyn TraitA + TraitB` only works when `TraitB` is an auto trait like `Send` or `Sync`.
-
-4. **Custom storage** - C++'s manual approach gives you full control over how the erased type is stored. You can use arena allocation, custom allocators, or other memory layouts. Rust can do this too, but it's not simpler than C++.
+3. **Custom storage** - C++'s manual approach gives you full control over how the erased type is stored. You can use arena allocation, custom allocators, or other memory layouts. Rust can do this too, but it's not simpler than C++.
 
 ## Conclusion
 
