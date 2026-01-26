@@ -192,7 +192,7 @@ Notice:
 This is type erasure: hiding the concrete type behind a uniform interface while maintaining *value semantics*.
 
 {% alert(type="note") %}
-Type erasure gives you value semantics at the API level. The heap allocation still happens, but it's an implementation detail hidden from callers.
+Type erasure gives you value semantics at the API level. The heap allocation still happens with the naive approach, but it's an implementation detail hidden from callers.
 {% end %}
 
 ## Implementing type erasure
@@ -331,14 +331,14 @@ In practice, this C++-style wrapper pattern is rare in Rust. The trait system's 
 
 Rust's built-in type erasure is convenient, but C++'s manual approach offers more flexibility in certain scenarios:
 
-1. **Small buffer optimization** - C++'s `std::function` stores small callables inline, avoiding heap allocation (see Raymond Chen's [explanation of how this works](https://devblogs.microsoft.com/oldnewthing/20200514-00/?p=103749)). Rust's `Box<dyn Trait>` always heap-allocates. That said, if you're implementing custom type erasure (as shown in this post), you have to implement SBO yourself in both languages. Neither makes it easy. C++ just ships with it for the callable case.
+1. **Small buffer optimization** - C++'s `std::function` stores small callables inline, avoiding heap allocation (see Raymond Chen's [explanation of how this works](https://devblogs.microsoft.com/oldnewthing/20200514-00/?p=103749)). Rust's `Box<dyn Trait>` always heap-allocates. To be clear: the custom type erasure implementation shown earlier in this post uses `unique_ptr`, which also heap-allocates. SBO is an optimization you'd have to implement yourself in either language. The difference is that C++ ships with it for the callable case via `std::function`, while Rust's standard library doesn't provide an equivalent.
 
 2. **More flexible interface definition** - Rust trait objects have restrictions: traits with generic methods, methods returning `Self`, or methods taking `self` by value aren't object-safe. You also can't combine arbitrary traits - `dyn TraitA + TraitB` only works when `TraitB` is an auto trait like `Send` or `Sync`. C++ templates don't have these limitations since you control the `Concept` interface directly.
 
-3. **Custom storage** - C++'s manual approach gives you full control over how the erased type is stored. You can use arena allocation, custom allocators, or other memory layouts. Rust can do this too, but it's not simpler than C++.
+3. **Custom storage** - C++'s manual approach gives you full control over how the erased type is stored. You can use arena allocation, custom allocators, or other memory layouts. Rust can do this too, but it's harder.
 
 ## Conclusion
 
-C++ and Rust both support type erasure, but with different tradeoffs. Rust's `dyn Trait` makes the common case trivial: no boilerplate, non-intrusive traits, and the compiler handles the vtable. C++ requires manual implementation but offers more control when you need SBO, custom storage, or want to bypass object safety restrictions.
+C++ and Rust both support type erasure, but with different tradeoffs. Rust's `dyn Trait` makes the common case trivial: no boilerplate, non-intrusive traits, and the compiler handles the vtable. C++ requires manual implementation but offers more flexibility: no object safety restrictions, and `std::function` provides SBO out of the box for callables. For custom type erasure, both languages require extra effort if you want optimizations like SBO or custom storage.
 
 Code samples available on [GitHub](https://github.com/waifod/blog_code_samples/tree/main/2026-01-24_polymorphism_type_erasure).
