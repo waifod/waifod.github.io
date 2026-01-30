@@ -1,6 +1,6 @@
 +++
 title = "Software I like"
-date = 2025-01-11
+date = 2026-01-11
 
 [taxonomies]
 tags = ["software", "tools"]

@@ -1,6 +1,6 @@
 +++
 title = "LET'S ALL LOVE LAIN"
-date = 2024-10-15
+date = 2025-10-15
 
 [taxonomies]
 tags = ["anime", "lain", "resources"]
