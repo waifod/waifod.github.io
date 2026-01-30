@@ -159,7 +159,7 @@ impl Shape for ThirdPartyCircle {
 
 This is a key difference: C++ needs the external polymorphism pattern as a workaround, while Rust's trait system provides it naturally.
 
-[^newtype]: If you need to implement a foreign trait for a foreign type, you can use the newtype pattern: wrap the foreign type in your own struct and implement the trait on that.
+[^newtype]: If you need to implement a foreign trait for a foreign type, you can use the newtype pattern as a workaround for the [orphan rule](https://doc.rust-lang.org/reference/items/implementations.html#orphan-rules): wrap the foreign type in your own struct and implement the trait on that.
 
 ## Enter type erasure
 
@@ -333,9 +333,9 @@ Rust's built-in type erasure is convenient, but C++'s manual approach offers mor
 
 1. **Small buffer optimization** - C++'s `std::function` stores small callables inline, avoiding heap allocation (see Raymond Chen's [explanation of how this works](https://devblogs.microsoft.com/oldnewthing/20200514-00/?p=103749)). Rust's `Box<dyn Trait>` always heap-allocates. To be clear: the custom type erasure implementation shown earlier in this post uses `unique_ptr`, which also heap-allocates. SBO is an optimization you'd have to implement yourself in either language. The difference is that C++ ships with it for the callable case via `std::function`, while Rust's standard library doesn't provide an equivalent.
 
-2. **More flexible interface definition** - Rust trait objects have restrictions: traits with generic methods, methods returning `Self`, or methods taking `self` by value aren't object-safe. You also can't combine arbitrary traits - `dyn TraitA + TraitB` only works when `TraitB` is an auto trait like `Send` or `Sync`. C++ templates don't have these limitations since you control the `Concept` interface directly.
+2. **Custom storage** - C++'s manual approach gives you full control over how the erased type is stored. You can use arena allocation, custom allocators, or other memory layouts. Rust can do this too, but it's harder.
 
-3. **Custom storage** - C++'s manual approach gives you full control over how the erased type is stored. You can use arena allocation, custom allocators, or other memory layouts. Rust can do this too, but it's harder.
+3. **More flexible interface definition** - Rust trait objects have restrictions: traits with generic methods, methods returning `Self`, or methods taking `self` by value aren't object-safe. You also can't combine arbitrary traits - `dyn TraitA + TraitB` only works when `TraitB` is an auto trait like `Send` or `Sync`. C++ templates don't have these limitations since you control the `Concept` interface directly.
 
 ## Conclusion
 
