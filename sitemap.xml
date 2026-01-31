@@ -22,6 +22,10 @@
         <loc>https://waifod.dev/blog/page/1/</loc>
     </url>
     <url>
+        <loc>https://waifod.dev/blog/polymorphism-crtp/</loc>
+        <lastmod>2026-01-26</lastmod>
+    </url>
+    <url>
         <loc>https://waifod.dev/blog/polymorphism-type-erasure/</loc>
         <lastmod>2026-01-24</lastmod>
     </url>

@@ -1,0 +1,435 @@
+<!doctype html><html lang=en><head><meta charset=utf-8><meta content="width=device-width,initial-scale=1" name=viewport><meta content="default-src 'self'; style-src-attr 'unsafe-inline'" http-equiv=Content-Security-Policy><title>Polymorphism in C++ and Rust: Virtual, Final, and CRTP | よ waifod</title><link as=font crossorigin href=https://waifod.dev/fonts/FiraCode-Regular.woff2 rel=preload type=font/woff2><link as=font crossorigin href=https://waifod.dev/fonts/FiraCode-Bold.woff2 rel=preload type=font/woff2><link href="https://waifod.dev/css/style.css?h=287f84ed6c66dca911c6" rel=stylesheet><link href=https://waifod.dev/favicon.svg rel=icon type=text/svg+xml><script src="https://waifod.dev/js/auto-close-popover-on-resize.js?h=4ef87d6fc7b98b22e044" defer></script><script src="https://waifod.dev/js/copy-code-to-clipboard.js?h=b34dc626be3e4c8a0f55" defer></script><link href=https://waifod.dev/blog/polymorphism-crtp/ rel=canonical><link title="よ waifod" href=https://waifod.dev/atom.xml rel=alternate type=application/atom+xml><meta content="Matteo Durante" name=author><meta content="In which I teach myself about the performance costs of runtime polymorphism and the alternatives, from simple to arcane…" name=description><meta content="index, follow" name=robots><meta content=#211f1a name=theme-color><meta content=dark name=color-scheme><meta content="Polymorphism in C++ and Rust: Virtual, Final, and CRTP" property=og:title><meta content=article property=og:type><meta content=https://waifod.dev/blog/polymorphism-crtp/ property=og:url><meta content="In which I teach myself about the performance costs of runtime polymorphism and the alternatives, from simple to arcane…" property=og:description><meta content="よ waifod" property=og:site_name><meta content=2026-01-31T00:18:57.828626722+00:00 property=og:updated_time><meta content=2026-01-26T00:00:00+00:00 property=article:published_time><meta content=c++ property=article:tag><meta content=rust property=article:tag><meta content=programming property=article:tag><meta content=patterns property=article:tag><body class=layout-center data-theme=terminus><header class=header><div class=header-container><span class=header-logo-container> <a href=https://waifod.dev> <span class=logo>よ waifod</span> </a> </span></div><nav aria-label="Main Menu" class=main-menu><a class=skip-to-content href=#main>Skip to main content</a><button class=main-menu-dropdown-button popovertarget=nav-menu>Menu</button><ul aria-label="Site Navigation" class=main-menu-items id=nav-menu popover><li><a href=https://waifod.dev/blog/>blog</a><li><a href=https://waifod.dev/tags/>tags</a><li><a href=https://github.com/waifod target=_blank>github</a></ul></nav></header><main id=main><article class="post content"><header><h1 class=post-title><a href=https://waifod.dev/blog/polymorphism-crtp/>Polymorphism in C++ and Rust: Virtual, Final, and CRTP</a></h1><ul class="post-meta hidden"><li title="Published on 2026-01-26"><time datetime=2026-01-26>2026.01.26</time><li aria-hidden=true role=separator>::<li title="2502 words"><time datetime=PT13M>13 min</time> read</ul><div class=post-tags><span>#<a href=https://waifod.dev/tags/c/ rel=tag>c++</a></span><span>#<a href=https://waifod.dev/tags/rust/ rel=tag>rust</a></span><span>#<a href=https://waifod.dev/tags/programming/ rel=tag>programming</a></span><span>#<a href=https://waifod.dev/tags/patterns/ rel=tag>patterns</a></span></div></header><nav class=toc><h2>Contents</h2><ul><li><a href=https://waifod.dev/blog/polymorphism-crtp/#the-problem>The problem</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#virtual-functions-the-default>Virtual functions: the default</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#restoring-performance-the-final-keyword>Restoring performance: the final keyword</a> <ul><li><a href=https://waifod.dev/blog/polymorphism-crtp/#when-final-doesn-t-help>When final doesn't help</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#the-benchmarks>The benchmarks</a></ul><li><a href=https://waifod.dev/blog/polymorphism-crtp/#crtp-when-you-need-more>CRTP: when you need more</a> <ul><li><a href=https://waifod.dev/blog/polymorphism-crtp/#the-pattern>The pattern</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#performance>Performance</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#when-crtp-is-actually-useful>When CRTP is actually useful</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#the-downsides>The downsides</a></ul><li><a href=https://waifod.dev/blog/polymorphism-crtp/#the-assembly>The assembly</a> <ul><li><a href=https://waifod.dev/blog/polymorphism-crtp/#why-bmfinaldirect-is-faster-than-bmdirect>Why bmFinalDirect is faster than bmDirect</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#virtual-dispatch-through-pointers>Virtual dispatch through pointers</a></ul><li><a href=https://waifod.dev/blog/polymorphism-crtp/#heterogeneous-collections>Heterogeneous collections</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#rust-s-approach>Rust's approach</a> <ul><li><a href=https://waifod.dev/blog/polymorphism-crtp/#memory-layout-differences>Memory layout differences</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#fluent-builders-without-crtp>Fluent builders without CRTP</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#extension-traits-more-powerful-than-crtp-mixins>Extension traits: more powerful than CRTP mixins</a></ul><li><a href=https://waifod.dev/blog/polymorphism-crtp/#conclusion>Conclusion</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#appendix-raw-benchmark-output>Appendix: raw benchmark output</a> <ul><li><a href=https://waifod.dev/blog/polymorphism-crtp/#direct>Direct</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#crtp>CRTP</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#virtual>Virtual</a><li><a href=https://waifod.dev/blog/polymorphism-crtp/#final>Final</a></ul></ul></nav><p>In which I teach myself about the performance costs of runtime polymorphism and the alternatives, from simple to arcane.</p><span id=continue-reading></span><h2 id=the-problem>The problem</h2><p>Sometimes a base class needs to know its derived type at compile time. Fluent builders that return <code>WidgetBuilder&</code> instead of <code>Builder&</code>. Per-class static data. Calling derived methods without vtable overhead.<p>Virtual functions don't help with the first two (they change behavior, not types), and they're overkill for the third when you know the concrete type at compile time.<p>Let's look at the options. Spoiler: if you only care about performance, skip to <code>final</code>. CRTP is for when the base class actually needs to <em>know</em> the derived type.<h2 id=virtual-functions-the-default>Virtual functions: the default</h2><p>Virtual functions are C++'s standard polymorphism mechanism:<pre class=language-cpp data-lang=cpp style=color:#c0c5ce;background-color:#2b303b><code class=language-cpp data-lang=cpp><span style=color:#b48ead>struct </span><span>Shape {
+</span><span>    </span><span style=color:#b48ead>virtual </span><span style=color:#8fa1b3>~Shape</span><span>() = </span><span style=color:#b48ead>default</span><span>;
+</span><span>    </span><span style=color:#b48ead>virtual double </span><span style=color:#8fa1b3>getArea</span><span>() </span><span style=color:#b48ead>const </span><span>= </span><span style=color:#d08770>0</span><span>;
+</span><span>};
+</span><span>
+</span><span style=color:#b48ead>struct </span><span>Square : </span><span style=color:#a3be8c>Shape </span><span>{
+</span><span>    </span><span style=color:#b48ead>double</span><span> side;
+</span><span>    </span><span style=color:#b48ead>double </span><span style=color:#8fa1b3>getArea</span><span>() </span><span style=color:#b48ead>const override </span><span>{ </span><span style=color:#b48ead>return</span><span> side * side; }
+</span><span>};
+</span></code></pre><p>When the compiler generates code for a call to <code>getArea()</code> through a <code>Shape*</code>, it doesn't know which implementation to call. It emits code that loads the vtable pointer from the object, indexes into the vtable, and performs an indirect call. This works for any derived type, but it has costs:<ul><li>One pointer load (vtable pointer from object)<li>One indexed load (function pointer from vtable)<li>One indirect call (branch to unknown address)<li>Potential cache miss on the vtable<li>Branch misprediction if the target varies<li>No inlining across the indirect call</ul><p>For hot paths, this adds up. More importantly, inlining enables further optimizations (constant propagation, dead code elimination, loop unrolling) that don't work across indirect calls.<p>There's also a memory cost: virtual classes embed a vtable pointer in each object. A <code>Square</code> with just <code>double side</code> goes from 8 to 16 bytes with virtuals. This affects cache utilization and can matter more than dispatch overhead for small objects in tight loops.<p>That said, 3x slower on a microbenchmark doesn't mean 3x slower application. If you're calling a virtual function once per user click, the overhead is nanoseconds. The performance argument applies to tight loops, not general architecture.<h2 id=restoring-performance-the-final-keyword>Restoring performance: the <code>final</code> keyword</h2><p>C++11's <code>final</code> prevents a class from being inherited or a virtual function from being overridden. When the compiler sees a call on a <code>final</code> class, it knows no derived class could override the method, so it can devirtualize and potentially inline.<pre class=language-cpp data-lang=cpp style=color:#c0c5ce;background-color:#2b303b><code class=language-cpp data-lang=cpp><span style=color:#b48ead>struct </span><span>SquareFinal </span><span style=color:#b48ead>final </span><span>: </span><span style=color:#a3be8c>Shape </span><span>{
+</span><span>    </span><span style=color:#b48ead>double</span><span> side;
+</span><span>    </span><span style=color:#b48ead>double </span><span style=color:#8fa1b3>getArea</span><span>() </span><span style=color:#b48ead>const override </span><span>{ </span><span style=color:#b48ead>return</span><span> side * side; }
+</span><span>};
+</span></code></pre><p>A <code>SquareFinal&</code> can only refer to a <code>SquareFinal</code>, never a subclass (they can't exist), so the compiler can replace virtual dispatch with a direct call.<p>You can also mark individual methods <code>final</code> while leaving the class open:<pre class=language-cpp data-lang=cpp style=color:#c0c5ce;background-color:#2b303b><code class=language-cpp data-lang=cpp><span style=color:#b48ead>struct </span><span>Square : </span><span style=color:#a3be8c>Shape </span><span>{
+</span><span>    </span><span style=color:#b48ead>double</span><span> side;
+</span><span>    </span><span style=color:#b48ead>double </span><span style=color:#8fa1b3>getArea</span><span>() </span><span style=color:#b48ead>const override final </span><span>{ </span><span style=color:#b48ead>return</span><span> side * side; }
+</span><span>};
+</span></code></pre><p><code>final</code> helps with concrete types:<pre class=language-cpp data-lang=cpp style=color:#c0c5ce;background-color:#2b303b><code class=language-cpp data-lang=cpp><span>std::vector&lt;SquareFinal> squares;
+</span><span style=color:#b48ead>for </span><span>(</span><span style=color:#b48ead>const auto</span><span>& s : squares) {
+</span><span>    total += s.</span><span style=color:#bf616a>getArea</span><span>();  </span><span style=color:#65737e>// Devirtualized
+</span><span>}
+</span></code></pre><h3 id=when-final-doesn-t-help>When <code>final</code> doesn't help</h3><p>Through base pointers:<pre class=language-cpp data-lang=cpp style=color:#c0c5ce;background-color:#2b303b><code class=language-cpp data-lang=cpp><span>std::vector&lt;std::unique_ptr&lt;Shape>> shapes;
+</span><span style=color:#b48ead>for </span><span>(</span><span style=color:#b48ead>const auto</span><span>& shape : shapes) {
+</span><span>    total += shape-></span><span style=color:#bf616a>getArea</span><span>();  </span><span style=color:#65737e>// Still virtual
+</span><span>}
+</span></code></pre><p>The compiler only sees <code>Shape*</code>. It can't know the pointee type, so it must emit virtual dispatch. <code>final</code> on the derived class doesn't help here.<h3 id=the-benchmarks>The benchmarks</h3><p>I ran benchmarks comparing direct calls, virtual dispatch, and <code>final</code> classes, iterating over 10000 shapes calling <code>getArea()</code>. Code is on <a href=https://github.com/waifod/blog_code_samples/tree/main/2026-01-26_polymorphism_crtp>GitHub</a>. Machine is a <a href=/blog/my-metal/#hetzner-cloud-cax21>Hetzner Cloud CAX21</a> (ARM Neoverse-N1), compiled with clang 21.1.8 at <code>-O2</code>. Full <code>perf stat</code> output is in the <a href=https://waifod.dev/blog/polymorphism-crtp/#appendix-raw-benchmark-output>appendix</a>.<pre style=color:#c0c5ce;background-color:#2b303b><code><span>$ perf stat -e cycles,instructions,cache-misses,branch-misses \
+</span><span>    ./bench_direct --benchmark_repetitions=50 --benchmark_report_aggregates_only=true
+</span></code></pre><table><thead><tr><th>Benchmark<th>Mean (ns)<th>Ratio<th>Branch miss/iter<th>Cache miss/iter<th>Notes<tbody><tr><td>bmDirect<td>8783<td>1.0x<td>1.0<td>92<td>Plain struct, <code>vector&lt;Square></code><tr><td>bmVirtualDirect<td>24675<td>2.8x<td>0.4<td>55<td><code>vector&lt;Square></code> with virtual base<tr><td>bmVirtualHomogeneous<td>25992<td>3.0x<td>0.4<td>153<td><code>vector&lt;unique_ptr&lt;Shape>></code>, all squares<tr><td>bmFinalDirect<td>7108<td>0.8x<td>1.3<td>177<td><code>vector&lt;SquareFinal></code><tr><td>bmFinalHomogeneous<td>25744<td>2.9x<td>0.4<td>144<td><code>vector&lt;unique_ptr&lt;Shape>></code>, all final squares</table><p>The non-virtual baseline is ~3x faster than virtual dispatch. No vtable pointer means smaller objects (8 vs 16 bytes), better cache utilization, and the compiler can inline everything.<p>Curiously, bmFinalDirect (7108 ns) beats bmDirect (8783 ns) by 19%. The <a href=https://waifod.dev/blog/polymorphism-crtp/#the-assembly>assembly section</a> explains why: auto-vectorization. The point stands that <code>final</code> eliminates virtual dispatch cost, but the specific numbers here are misleading for reasons we'll see later.<p>Without <code>final</code>, even iterating over a homogeneous <code>vector&lt;Square></code> (bmVirtualDirect) pays virtual dispatch cost. The compiler conservatively emits virtual calls because a subclass <em>could</em> exist. <code>final</code> tells the compiler "no subclasses," enabling devirtualization.<p>Through base pointers (bmVirtualHomogeneous, bmFinalHomogeneous), <code>final</code> provides no benefit. The compiler can't see through <code>Shape*</code>.<h2 id=crtp-when-you-need-more>CRTP: when you need more</h2><p>The Curiously Recurring Template Pattern is more complex. Use it when <code>final</code> isn't enough—typically when you need type-aware base class functionality, not just performance.<h3 id=the-pattern>The pattern</h3><p>A class inherits from a template instantiated with itself:<pre class=language-cpp data-lang=cpp style=color:#c0c5ce;background-color:#2b303b><code class=language-cpp data-lang=cpp><span style=color:#b48ead>template</span><span>&lt;</span><span style=color:#b48ead>typename</span><span> Derived>
+</span><span style=color:#b48ead>struct </span><span>Shape {
+</span><span>    </span><span style=color:#b48ead>double </span><span style=color:#8fa1b3>getArea</span><span>() </span><span style=color:#b48ead>const </span><span>{
+</span><span>        </span><span style=color:#b48ead>return </span><span>static_cast&lt;</span><span style=color:#b48ead>const</span><span> Derived*>(</span><span style=color:#bf616a>this</span><span>)-></span><span style=color:#bf616a>area</span><span>();
+</span><span>    }
+</span><span>};
+</span><span>
+</span><span style=color:#b48ead>struct </span><span>Square : </span><span style=color:#a3be8c>Shape</span><span>&lt;Square> {
+</span><span>    </span><span style=color:#b48ead>double</span><span> side;
+</span><span>    </span><span style=color:#b48ead>double </span><span style=color:#8fa1b3>area</span><span>() </span><span style=color:#b48ead>const </span><span>{ </span><span style=color:#b48ead>return</span><span> side * side; }
+</span><span>};
+</span><span>
+</span><span style=color:#b48ead>struct </span><span>Triangle : </span><span style=color:#a3be8c>Shape</span><span>&lt;Triangle> {
+</span><span>    </span><span style=color:#b48ead>double</span><span> base, height;
+</span><span>    </span><span style=color:#b48ead>double </span><span style=color:#8fa1b3>area</span><span>() </span><span style=color:#b48ead>const </span><span>{ </span><span style=color:#b48ead>return </span><span style=color:#d08770>0.5 </span><span>* base * height; }
+</span><span>};
+</span></code></pre><p><code>Square</code> inherits from <code>Shape&lt;Square></code>. The base class knows its derived type at compile time, so it can call <code>area()</code> without virtual dispatch. The <code>static_cast&lt;const Derived*>(this)</code> is a downcast—safe <em>only if</em> the inheritance is set up correctly. The cast assumes <code>this</code> points to a <code>Derived</code>, which is true when <code>Shape&lt;Derived></code> is a base of <code>Derived</code>. But the compiler can't verify this; it trusts you. Inherit <code>Shape&lt;Square></code> from <code>Triangle</code>, and the cast compiles fine but produces undefined behavior. No runtime overhead (unlike <code>dynamic_cast</code>), but no checking either. Safety comes from following the pattern correctly, not from the language enforcing it.<h3 id=performance>Performance</h3><p>CRTP matches direct calls:<table><thead><tr><th>Benchmark<th>Mean (ns)<th>Ratio<th>Branch miss/iter<th>Cache miss/iter<tbody><tr><td>bmDirect<td>8783<td>1.0x<td>1.0<td>92<tr><td>bmCrtp<td>8765<td>1.0x<td>1.0<td>91</table><p>The template machinery disappears at compile time, and the compiler <em>can</em> inline everything, producing the same code as writing <code>getArea()</code> directly in each class. But inlining isn't guaranteed—depends on optimization level, function complexity, and compiler heuristics. For trivial functions at <code>-O2</code>, it's reliable. For complex implementations, check the assembly.<h3 id=when-crtp-is-actually-useful>When CRTP is actually useful</h3><p>If you only want to avoid virtual dispatch, use <code>final</code>. It's simpler and achieves the same performance. CRTP is for when the base class needs to <em>know</em> the derived type:<p><strong>Per-class static data:</strong><pre class=language-cpp data-lang=cpp style=color:#c0c5ce;background-color:#2b303b><code class=language-cpp data-lang=cpp><span style=color:#b48ead>template</span><span>&lt;</span><span style=color:#b48ead>typename</span><span> Derived>
+</span><span style=color:#b48ead>struct </span><span>Counted {
+</span><span>    </span><span style=color:#b48ead>static inline int</span><span> count = </span><span style=color:#d08770>0</span><span>;
+</span><span>    </span><span style=color:#8fa1b3>Counted</span><span>() { ++count; }
+</span><span>    </span><span style=color:#8fa1b3>~Counted</span><span>() { --count; }
+</span><span>};
+</span><span>
+</span><span style=color:#b48ead>struct </span><span>Widget : </span><span style=color:#a3be8c>Counted</span><span>&lt;Widget> {};
+</span><span style=color:#b48ead>struct </span><span>Gadget : </span><span style=color:#a3be8c>Counted</span><span>&lt;Gadget> {};
+</span><span style=color:#65737e>// Widget::count and Gadget::count are independent
+</span></code></pre><p><strong>Fluent interfaces that preserve the concrete type:</strong><pre class=language-cpp data-lang=cpp style=color:#c0c5ce;background-color:#2b303b><code class=language-cpp data-lang=cpp><span style=color:#b48ead>template</span><span>&lt;</span><span style=color:#b48ead>typename</span><span> Derived>
+</span><span style=color:#b48ead>struct </span><span>Builder {
+</span><span>    std::string name;
+</span><span>    
+</span><span>    Derived& </span><span style=color:#8fa1b3>set_name</span><span>(std::string </span><span style=color:#bf616a>n</span><span>) {
+</span><span>        name = std::</span><span style=color:#bf616a>move</span><span>(n);
+</span><span>        </span><span style=color:#b48ead>return </span><span>static_cast&lt;Derived&>(*</span><span style=color:#bf616a>this</span><span>);
+</span><span>    }
+</span><span>};
+</span><span>
+</span><span style=color:#b48ead>struct </span><span>WidgetBuilder : </span><span style=color:#a3be8c>Builder</span><span>&lt;WidgetBuilder> {
+</span><span>    </span><span style=color:#b48ead>int</span><span> size = </span><span style=color:#d08770>0</span><span>;
+</span><span>    
+</span><span>    WidgetBuilder& </span><span style=color:#8fa1b3>set_size</span><span>(</span><span style=color:#b48ead>int </span><span style=color:#bf616a>s</span><span>) { size = s; </span><span style=color:#b48ead>return </span><span>*</span><span style=color:#bf616a>this</span><span>; }
+</span><span>};
+</span><span>
+</span><span style=color:#b48ead>auto</span><span> b = </span><span style=color:#bf616a>WidgetBuilder</span><span>{}.</span><span style=color:#bf616a>set_name</span><span>("</span><span style=color:#a3be8c>foo</span><span>").</span><span style=color:#bf616a>set_size</span><span>(</span><span style=color:#d08770>42</span><span>);  </span><span style=color:#65737e>// Chaining works
+</span></code></pre><p>Without CRTP, <code>set_name()</code> would return <code>Builder&</code>, and you'd lose access to <code>set_size()</code>.<p><strong>Mixin classes:</strong><pre class=language-cpp data-lang=cpp style=color:#c0c5ce;background-color:#2b303b><code class=language-cpp data-lang=cpp><span style=color:#b48ead>template</span><span>&lt;</span><span style=color:#b48ead>typename</span><span> Derived>
+</span><span style=color:#b48ead>struct </span><span>Printable {
+</span><span>    </span><span style=color:#b48ead>void </span><span style=color:#8fa1b3>print</span><span>() </span><span style=color:#b48ead>const </span><span>{
+</span><span>        std::cout &lt;&lt; static_cast&lt;</span><span style=color:#b48ead>const</span><span> Derived*>(</span><span style=color:#bf616a>this</span><span>)-></span><span style=color:#bf616a>to_string</span><span>() &lt;&lt; '</span><span style=color:#96b5b4>\n</span><span>';
+</span><span>    }
+</span><span>};
+</span><span>
+</span><span style=color:#b48ead>template</span><span>&lt;</span><span style=color:#b48ead>typename</span><span> Derived>
+</span><span style=color:#b48ead>struct </span><span>Comparable {
+</span><span>    </span><span style=color:#b48ead>bool </span><span style=color:#8fa1b3>operator!=</span><span>(</span><span style=color:#b48ead>const</span><span> Derived& </span><span style=color:#bf616a>other</span><span>) </span><span style=color:#b48ead>const </span><span>{
+</span><span>        </span><span style=color:#b48ead>return </span><span>!(static_cast&lt;</span><span style=color:#b48ead>const</span><span> Derived&>(*</span><span style=color:#bf616a>this</span><span>) == other);
+</span><span>    }
+</span><span>};
+</span><span>
+</span><span style=color:#b48ead>struct </span><span>Widget : </span><span style=color:#a3be8c>Printable</span><span>&lt;Widget>, </span><span style=color:#a3be8c>Comparable</span><span>&lt;Widget> {
+</span><span>    std::string name;
+</span><span>    std::string </span><span style=color:#8fa1b3>to_string</span><span>() </span><span style=color:#b48ead>const </span><span>{ </span><span style=color:#b48ead>return</span><span> name; }
+</span><span>    </span><span style=color:#b48ead>bool </span><span style=color:#8fa1b3>operator==</span><span>(</span><span style=color:#b48ead>const</span><span> Widget& </span><span style=color:#bf616a>other</span><span>) </span><span style=color:#b48ead>const </span><span>{ </span><span style=color:#b48ead>return</span><span> name == other.</span><span style=color:#bf616a>name</span><span>; }
+</span><span>};
+</span></code></pre><p>CRTP lets you compose functionality from multiple bases, each adding methods that depend on the derived type. <code>std::enable_shared_from_this</code> uses this pattern.<p><strong>Pre-C++20 interface enforcement:</strong><p>Before concepts, CRTP could enforce interfaces at compile time while providing default implementations using the derived type. Concepts can verify a type has certain methods, but can't <em>add</em> methods. CRTP does both: checks that <code>Derived</code> has <code>area()</code> (by calling it) and provides <code>getArea()</code> that uses it.<h3 id=the-downsides>The downsides</h3><p>CRTP has rough edges:<ol><li><strong>Confusing syntax</strong>: <code>class Derived : Base&lt;Derived></code> takes a moment to parse.<li><strong>No heterogeneous collections</strong>: each <code>Shape&lt;Derived></code> is a different type. You can't store <code>Shape&lt;Square></code> and <code>Shape&lt;Triangle></code> together without a common base, which brings back virtuals.<li><strong>Composition problems</strong>: multiple CRTP bases can lead to diamond inheritance.<li><strong>Compile-time costs</strong>: each instantiation generates a separate class. Many derived types means bloated compile times and binary size.<li><strong>Easy to misuse</strong>: nothing stops you from writing <code>class Wrong : Shape&lt;SomeOtherClass></code>, which compiles but invokes UB when <code>getArea()</code> is called. A private constructor with friend access catches <em>some</em> mistakes:</ol><pre class=language-cpp data-lang=cpp style=color:#c0c5ce;background-color:#2b303b><code class=language-cpp data-lang=cpp><span style=color:#b48ead>template</span><span>&lt;</span><span style=color:#b48ead>typename</span><span> Derived>
+</span><span style=color:#b48ead>struct </span><span>Shape {
+</span><span style=color:#b48ead>private</span><span>:
+</span><span>    </span><span style=color:#8fa1b3>Shape</span><span>() = </span><span style=color:#b48ead>default</span><span>;
+</span><span>    </span><span style=color:#b48ead>friend</span><span> Derived;
+</span><span>    
+</span><span style=color:#b48ead>public</span><span>:
+</span><span>    </span><span style=color:#b48ead>double </span><span style=color:#8fa1b3>getArea</span><span>() </span><span style=color:#b48ead>const </span><span>{
+</span><span>        </span><span style=color:#b48ead>return </span><span>static_cast&lt;</span><span style=color:#b48ead>const</span><span> Derived*>(</span><span style=color:#bf616a>this</span><span>)-></span><span style=color:#bf616a>area</span><span>();
+</span><span>    }
+</span><span>};
+</span></code></pre><p>Now only <code>Derived</code> can construct a <code>Shape&lt;Derived></code>. This catches <code>class Wrong : Shape&lt;Right></code> because <code>Wrong</code> can't access <code>Shape&lt;Right></code>'s constructor. It's not a complete solution though:<ul><li>It doesn't catch <code>class Wrong : Shape&lt;Wrong>, Shape&lt;Right></code> (multiple inheritance)<li>It doesn't help if <code>Derived</code> has a user-defined constructor that calls the base<li>It adds complexity for partial protection</ul><p>Still, it catches the most common copy-paste error:<pre class=language-cpp data-lang=cpp style=color:#c0c5ce;background-color:#2b303b><code class=language-cpp data-lang=cpp><span style=color:#65737e>// crtp_safety_test.cpp
+</span><span style=color:#b48ead>struct </span><span>Right : </span><span style=color:#a3be8c>Shape</span><span>&lt;Right> {
+</span><span>    </span><span style=color:#b48ead>double </span><span style=color:#8fa1b3>area</span><span>() </span><span style=color:#b48ead>const </span><span>{ </span><span style=color:#b48ead>return </span><span style=color:#d08770>0.0</span><span>; }
+</span><span>};
+</span><span>
+</span><span style=color:#b48ead>struct </span><span>Wrong : </span><span style=color:#a3be8c>Shape</span><span>&lt;Right> {  </span><span style=color:#65737e>// Oops, meant Shape&lt;Wrong>
+</span><span>    </span><span style=color:#b48ead>double </span><span style=color:#8fa1b3>area</span><span>() </span><span style=color:#b48ead>const </span><span>{ </span><span style=color:#b48ead>return </span><span style=color:#d08770>0.0</span><span>; }
+</span><span>};
+</span><span>
+</span><span style=color:#b48ead>int </span><span style=color:#8fa1b3>main</span><span>() {
+</span><span>    Right r;   </span><span style=color:#65737e>// OK
+</span><span>    Wrong w;   </span><span style=color:#65737e>// Error
+</span><span>}
+</span></code></pre><pre style=color:#c0c5ce;background-color:#2b303b><code><span>$ clang++ -std=c++20 crtp_safety_test.cpp
+</span><span>crtp_safety_test.cpp:27:11: error: call to implicitly-deleted default constructor of 'Wrong'
+</span><span>   27 |     Wrong w;
+</span><span>      |           ^
+</span><span>crtp_safety_test.cpp:21:16: note: default constructor of 'Wrong' is implicitly deleted because
+</span><span>                                 base class 'Shape&lt;Right>' has an inaccessible default constructor
+</span><span>   21 | struct Wrong : Shape&lt;Right> {
+</span><span>      |                ^
+</span><span>1 error generated.
+</span></code></pre><h2 id=the-assembly>The assembly</h2><p>To see what the compiler actually generates, compile with <code>-S</code>:<pre style=color:#c0c5ce;background-color:#2b303b><code><span>$ clang++ -O2 -std=c++20 -march=native -S bench_direct.cpp -o bench_direct.s
+</span></code></pre><p>Here's the direct (non-polymorphic) hot loop from the benchmark (ARM64):<pre class=language-asm data-lang=asm style=color:#c0c5ce;background-color:#2b303b><code class=language-asm data-lang=asm><span style=color:#8fa1b3>// from bench_direct.s
+</span><span style=color:#8fa1b3>.LBB0_29:                               // =>This Inner </span><span style=color:#b48ead>Loop </span><span style=color:#8fa1b3>Header: Depth=</span><span style=color:#d08770>2
+</span><span style=color:#8fa1b3>        ldr     d1</span><span>, [</span><span style=color:#8fa1b3>x10</span><span>, </span><span style=color:#8fa1b3>#</span><span style=color:#d08770>8</span><span>]</span><span style=color:#8fa1b3>!          // Load side from vector</span><span>, </span><span style=color:#8fa1b3>advance pointer
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>cmp     </span><span style=color:#8fa1b3>x10</span><span>, </span><span style=color:#8fa1b3>x22                // Check end
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fmul    </span><span style=color:#8fa1b3>d1</span><span>, </span><span style=color:#8fa1b3>d1</span><span>, </span><span style=color:#8fa1b3>d1              // side </span><span>* </span><span style=color:#8fa1b3>side
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fadd    </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d1              // total </span><span>+</span><span style=color:#8fa1b3>= area
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>str     </span><span style=color:#8fa1b3>d0</span><span>, [</span><span style=color:#bf616a>sp</span><span>, </span><span style=color:#8fa1b3>#</span><span style=color:#d08770>40</span><span>]           </span><span style=color:#8fa1b3>// Store for DoNotOptimize (!)
+</span><span style=color:#8fa1b3>        b.ne    .LBB0_29                // </span><span style=color:#b48ead>Loop
+</span></code></pre><p>Six instructions: load, compare, multiply, add, store, branch. The call to <code>getArea()</code> is fully inlined; there's no function call at all. Note the <code>str</code> instruction: that's Google Benchmark's <code>DoNotOptimize</code> forcing a store every iteration to prevent the compiler from optimizing away the accumulator. This extra store likely inhibits vectorization.<p>The CRTP version generates identical code (verified by comparing <code>bench_crtp.s</code>); the template machinery disappears entirely.<h3 id=why-bmfinaldirect-is-faster-than-bmdirect>Why bmFinalDirect is faster than bmDirect</h3><p>Remember the anomaly from the benchmarks: <code>final</code> (7108 ns) beat the non-polymorphic baseline (8783 ns) by 19%. The assembly shows why: bmFinalDirect vectorized while bmDirect didn't.<p>Here's the bmFinalDirect hot loop:<pre class=language-asm data-lang=asm style=color:#c0c5ce;background-color:#2b303b><code class=language-asm data-lang=asm><span style=color:#8fa1b3>// from bench_final.s
+</span><span style=color:#8fa1b3>.LBB0_30:                                   // =>This Inner </span><span style=color:#b48ead>Loop </span><span style=color:#8fa1b3>Header: Depth=</span><span style=color:#d08770>2
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>sub     </span><span style=color:#8fa1b3>x15</span><span>, </span><span style=color:#8fa1b3>x14</span><span>, </span><span style=color:#8fa1b3>#</span><span style=color:#d08770>32
+</span><span style=color:#8fa1b3>        subs    x13</span><span>, </span><span style=color:#8fa1b3>x13</span><span>, </span><span style=color:#8fa1b3>#</span><span style=color:#d08770>4
+</span><span style=color:#8fa1b3>        ld2     { v1.2d</span><span>, </span><span style=color:#8fa1b3>v2.2d }</span><span>, [</span><span style=color:#8fa1b3>x15</span><span>]     </span><span style=color:#8fa1b3>// Deinterleaved load: </span><span style=color:#d08770>4 </span><span style=color:#8fa1b3>doubles (</span><span style=color:#d08770>2 </span><span style=color:#8fa1b3>objects)
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fmul    </span><span style=color:#8fa1b3>v1.2d</span><span>, </span><span style=color:#8fa1b3>v1.2d</span><span>, </span><span style=color:#8fa1b3>v1.2d         // SIMD multiply: </span><span style=color:#d08770>2 </span><span style=color:#8fa1b3>squares </span><span style=color:#96b5b4>at </span><span style=color:#8fa1b3>once
+</span><span style=color:#8fa1b3>        ld2     { v2.2d</span><span>, </span><span style=color:#8fa1b3>v3.2d }</span><span>, [</span><span style=color:#8fa1b3>x14</span><span>]     </span><span style=color:#8fa1b3>// Load </span><span style=color:#d08770>4 </span><span style=color:#8fa1b3>more doubles (</span><span style=color:#d08770>2 </span><span style=color:#8fa1b3>more objects)
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>add     </span><span style=color:#8fa1b3>x14</span><span>, </span><span style=color:#8fa1b3>x14</span><span>, </span><span style=color:#8fa1b3>#</span><span style=color:#d08770>64
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>mov     </span><span style=color:#8fa1b3>d4</span><span>, </span><span style=color:#8fa1b3>v1.d</span><span>[</span><span style=color:#d08770>1</span><span>]
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fadd    </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d1                  // Accumulate
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fmul    </span><span style=color:#8fa1b3>v1.2d</span><span>, </span><span style=color:#8fa1b3>v2.2d</span><span>, </span><span style=color:#8fa1b3>v2.2d         // SIMD multiply
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fadd    </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d4
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>mov     </span><span style=color:#8fa1b3>d2</span><span>, </span><span style=color:#8fa1b3>v1.d</span><span>[</span><span style=color:#d08770>1</span><span>]
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fadd    </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d1
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fadd    </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d2
+</span><span style=color:#8fa1b3>        b.ne    .LBB0_30
+</span><span style=color:#8fa1b3>// After the </span><span style=color:#b48ead>loop</span><span style=color:#8fa1b3>:
+</span><span style=color:#8fa1b3>.LBB0_34:
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>str     </span><span style=color:#8fa1b3>d0</span><span>, [</span><span style=color:#bf616a>sp</span><span>, </span><span style=color:#8fa1b3>#</span><span style=color:#d08770>40</span><span>]               </span><span style=color:#8fa1b3>// DoNotOptimize store happens ONCE</span><span>, </span><span style=color:#8fa1b3>outside the </span><span style=color:#b48ead>loop
+</span></code></pre><p>The <code>ld2</code> instruction does a deinterleaved SIMD load (separating the vtable pointers from the doubles), and <code>fmul v1.2d, v1.2d, v1.2d</code> multiplies two doubles in parallel. It's processing 4 elements per iteration. Crucially, the <code>DoNotOptimize</code> store was hoisted outside the loop.<p>Compare this to the bmDirect loop above: the <code>str</code> happens every iteration, which likely prevents vectorization. But why did the compiler hoist the store for <code>final</code> and not for <code>direct</code>? Both benchmarks use the same <code>DoNotOptimize(total)</code> pattern. My best guess is that the different object layouts (16-byte <code>SquareFinal</code> vs 8-byte <code>Square</code>) led the optimizer down different code paths. Compiler heuristics are fickle.<p>To confirm this is a benchmark artifact, let's remove the harness entirely:<pre class=language-cpp data-lang=cpp style=color:#c0c5ce;background-color:#2b303b><code class=language-cpp data-lang=cpp><span style=color:#b48ead>#include </span><span>&lt;</span><span style=color:#a3be8c>cstddef</span><span>>
+</span><span style=color:#b48ead>#include </span><span>&lt;</span><span style=color:#a3be8c>random</span><span>>
+</span><span style=color:#b48ead>#include </span><span>&lt;</span><span style=color:#a3be8c>vector</span><span>>
+</span><span>
+</span><span style=color:#b48ead>constexpr</span><span> std::size_t kNumShapes = </span><span style=color:#d08770>10000</span><span>;
+</span><span>
+</span><span style=color:#b48ead>struct </span><span>Square {
+</span><span>    </span><span style=color:#b48ead>double</span><span> side;
+</span><span>    </span><span style=color:#b48ead>explicit </span><span style=color:#8fa1b3>Square</span><span>(</span><span style=color:#b48ead>double </span><span style=color:#bf616a>s</span><span>) : </span><span style=color:#bf616a>side</span><span>(s) {}
+</span><span>    </span><span style=color:#b48ead>double </span><span style=color:#8fa1b3>getArea</span><span>() </span><span style=color:#b48ead>const </span><span>{ </span><span style=color:#b48ead>return</span><span> side * side; }
+</span><span>};
+</span><span>
+</span><span style=color:#65737e>// noinline prevents the compiler from inlining sumAreas into main,
+</span><span style=color:#65737e>// so we can inspect the loop in isolation in the assembly
+</span><span style=color:#b48ead>__attribute__</span><span>((noinline))
+</span><span style=color:#b48ead>double </span><span style=color:#8fa1b3>sumAreas</span><span>(</span><span style=color:#b48ead>const</span><span> std::vector&lt;Square>& </span><span style=color:#bf616a>squares</span><span>) {
+</span><span>    </span><span style=color:#b48ead>double</span><span> total = </span><span style=color:#d08770>0.0</span><span>;
+</span><span>    </span><span style=color:#b48ead>for </span><span>(</span><span style=color:#b48ead>const auto</span><span>& s : squares) {
+</span><span>        total += s.</span><span style=color:#bf616a>getArea</span><span>();
+</span><span>    }
+</span><span>    </span><span style=color:#b48ead>return</span><span> total;
+</span><span>}
+</span><span>
+</span><span style=color:#b48ead>int </span><span style=color:#8fa1b3>main</span><span>() {
+</span><span>    std::mt19937 </span><span style=color:#bf616a>rng</span><span>(</span><span style=color:#d08770>42</span><span>);
+</span><span>    std::uniform_real_distribution&lt;</span><span style=color:#b48ead>double</span><span>> </span><span style=color:#bf616a>dist</span><span>(</span><span style=color:#d08770>1.0</span><span>, </span><span style=color:#d08770>10.0</span><span>);
+</span><span>
+</span><span>    std::vector&lt;Square> squares;
+</span><span>    </span><span style=color:#b48ead>for </span><span>(std::size_t i = </span><span style=color:#d08770>0</span><span>; i &lt; </span><span style=color:#d08770>kNumShapes</span><span>; ++i) {
+</span><span>        squares.</span><span style=color:#bf616a>emplace_back</span><span>(</span><span style=color:#bf616a>dist</span><span>(rng));
+</span><span>    }
+</span><span>
+</span><span>    </span><span style=color:#65737e>// volatile prevents the compiler from optimizing away the call entirely
+</span><span>    </span><span style=color:#b48ead>volatile double</span><span> result = </span><span style=color:#bf616a>sumAreas</span><span>(squares);
+</span><span>    </span><span style=color:#b48ead>return </span><span>static_cast&lt;</span><span style=color:#b48ead>int</span><span>>(result) & </span><span style=color:#d08770>1</span><span>;
+</span><span>}
+</span></code></pre><p>Sure enough, the compiler vectorizes it:<pre class=language-asm data-lang=asm style=color:#c0c5ce;background-color:#2b303b><code class=language-asm data-lang=asm><span style=color:#8fa1b3>// from direct_standalone.s
+</span><span style=color:#8fa1b3>.LBB0_5:                                // =>This Inner </span><span style=color:#b48ead>Loop </span><span style=color:#8fa1b3>Header: Depth=</span><span style=color:#d08770>1
+</span><span style=color:#8fa1b3>        ldp     q1</span><span>, </span><span style=color:#8fa1b3>q2</span><span>, [</span><span style=color:#8fa1b3>x12</span><span>, </span><span style=color:#8fa1b3>#</span><span>-</span><span style=color:#d08770>16</span><span>]     </span><span style=color:#8fa1b3>// Load </span><span style=color:#d08770>4 </span><span style=color:#8fa1b3>doubles
+</span><span style=color:#8fa1b3>        subs    x13</span><span>, </span><span style=color:#8fa1b3>x13</span><span>, </span><span style=color:#8fa1b3>#</span><span style=color:#d08770>4            </span><span style=color:#8fa1b3>// Process </span><span style=color:#d08770>4 </span><span style=color:#8fa1b3>per iteration
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>add     </span><span style=color:#8fa1b3>x12</span><span>, </span><span style=color:#8fa1b3>x12</span><span>, </span><span style=color:#8fa1b3>#</span><span style=color:#d08770>32
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fmul    </span><span style=color:#8fa1b3>v1.2d</span><span>, </span><span style=color:#8fa1b3>v1.2d</span><span>, </span><span style=color:#8fa1b3>v1.2d     // SIMD square
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>mov     </span><span style=color:#8fa1b3>d3</span><span>, </span><span style=color:#8fa1b3>v1.d</span><span>[</span><span style=color:#d08770>1</span><span>]
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fadd    </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d1
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fmul    </span><span style=color:#8fa1b3>v1.2d</span><span>, </span><span style=color:#8fa1b3>v2.2d</span><span>, </span><span style=color:#8fa1b3>v2.2d     // SIMD square
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fadd    </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d3
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>mov     </span><span style=color:#8fa1b3>d2</span><span>, </span><span style=color:#8fa1b3>v1.d</span><span>[</span><span style=color:#d08770>1</span><span>]
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fadd    </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d1
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>fadd    </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d0</span><span>, </span><span style=color:#8fa1b3>d2
+</span><span style=color:#8fa1b3>        b.ne    .LBB0_5
+</span></code></pre><p>Same vectorization pattern: <code>ldp</code> loads 4 doubles, <code>fmul v1.2d</code> squares two at a time. The 8-byte <code>Square</code> vectorizes fine without the benchmark framework.<p>The lesson: microbenchmarks can mislead in subtle ways. The performance difference here is a Google Benchmark artifact, not an inherent property of <code>final</code> vs non-polymorphic code. The qualitative conclusions (virtual dispatch costs ~3x, <code>final</code> eliminates that cost) still hold.<h3 id=virtual-dispatch-through-pointers>Virtual dispatch through pointers</h3><p>Here's what virtual dispatch looks like through <code>unique_ptr</code>:<pre class=language-asm data-lang=asm style=color:#c0c5ce;background-color:#2b303b><code class=language-asm data-lang=asm><span style=color:#8fa1b3>// from bench_virtual.s
+</span><span style=color:#8fa1b3>.LBB1_2:                                // =>This Inner </span><span style=color:#b48ead>Loop </span><span style=color:#8fa1b3>Header: Depth=</span><span style=color:#d08770>1
+</span><span style=color:#8fa1b3>        ldr     x8</span><span>, [</span><span style=color:#8fa1b3>x21</span><span>], </span><span style=color:#8fa1b3>#</span><span style=color:#d08770>16          </span><span style=color:#8fa1b3>// Load unique_ptr (Shape</span><span>*</span><span style=color:#8fa1b3>)</span><span>, </span><span style=color:#8fa1b3>advance by </span><span style=color:#d08770>16
+</span><span style=color:#8fa1b3>        ldr     x8</span><span>, [</span><span style=color:#8fa1b3>x8</span><span>]                </span><span style=color:#8fa1b3>// Load vtable pointer from object
+</span><span style=color:#8fa1b3>        blr     x8                      // Indirect </span><span style=color:#b48ead>call </span><span style=color:#8fa1b3>to first vtable entry
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>cmp     </span><span style=color:#8fa1b3>x21</span><span>, </span><span style=color:#8fa1b3>x20                // Check end
+</span><span style=color:#8fa1b3>        </span><span style=color:#b48ead>mov     </span><span style=color:#8fa1b3>x0</span><span>, </span><span style=color:#8fa1b3>x21
+</span><span style=color:#8fa1b3>        b.ne    .LBB1_2                 // </span><span style=color:#b48ead>Loop
+</span></code></pre><p>The <code>blr x8</code> is the performance killer: an indirect call to whatever address is in <code>x8</code>. The CPU can't know the target until it completes the load chain (pointer -> vtable pointer -> function pointer), so it speculates. Modern CPUs have indirect branch predictors that learn patterns, which is why the homogeneous case (~1 branch miss per iteration) isn't catastrophic: the predictor learns "it's always <code>Square::getArea</code>" and guesses correctly.<p>But look at the heterogeneous benchmark below: ~5000 branch misses per iteration, compared to ~1 for homogeneous. With a random 50/50 mix of squares and triangles, the predictor can't learn a pattern. Each misprediction flushes the pipeline and stalls execution until the correct target is resolved. That's why heterogeneous dispatch is 7x slower than the baseline, not 3x: the branch predictor penalty dominates.<p>The other cost is subtler: the CPU can't speculatively execute <em>past</em> the indirect call until it knows the target. With a direct call, the CPU knows where execution will continue and can fetch/decode those instructions in parallel. With <code>blr x8</code>, it's blocked until <code>x8</code> is resolved.<h2 id=heterogeneous-collections>Heterogeneous collections</h2><p>Out of curiosity, I tested randomly mixing squares and triangles:<table><thead><tr><th>Benchmark<th>Mean (ns)<th>Ratio<th>Branch miss/iter<th>Cache miss/iter<tbody><tr><td>bmDirect<td>8783<td>1.0x<td>1.0<td>92<tr><td>bmVirtualHeterogeneous<td>60911<td>6.9x<td>4950<td>43<tr><td>bmFinalHeterogeneous<td>61397<td>7.0x<td>5014<td>46</table><p>This is ~7x slower than the direct baseline, but the comparison is unfair. <strong>You can't do this without virtual dispatch.</strong> Each <code>Shape&lt;Derived></code> is a different type, so you can't mix them without a common base class, which brings back virtual functions. The 7x shows the cost of genuine runtime polymorphism when the branch predictor can't learn a pattern, not a static alternative you're ignoring.<p>Note that <code>final</code> provides no benefit here: the compiler can't see through <code>Shape*</code> to know the concrete type, so it emits virtual dispatch regardless.<p>This is the fundamental limitation of static polymorphism: you trade runtime flexibility for compile-time performance. If your design genuinely requires heterogeneous collections, virtual dispatch is the right tool. CRTP and <code>final</code> are optimizations for when you <em>don't</em> need that flexibility.<h2 id=rust-s-approach>Rust's approach</h2><p>Rust doesn't have CRTP because it doesn't need it. Traits with default implementations provide the same functionality:<pre class=language-rust data-lang=rust style=color:#c0c5ce;background-color:#2b303b><code class=language-rust data-lang=rust><span style=color:#b48ead>trait </span><span>Shape {
+</span><span>    </span><span style=color:#b48ead>fn </span><span style=color:#8fa1b3>area</span><span>(&</span><span style=color:#bf616a>self</span><span>) -> </span><span style=color:#b48ead>f64</span><span>;
+</span><span>    
+</span><span>    </span><span style=color:#b48ead>fn </span><span style=color:#8fa1b3>get_area</span><span>(&</span><span style=color:#bf616a>self</span><span>) -> </span><span style=color:#b48ead>f64 </span><span>{
+</span><span>        </span><span style=color:#bf616a>self</span><span>.</span><span style=color:#96b5b4>area</span><span>()
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style=color:#b48ead>struct </span><span>Square { </span><span style=color:#bf616a>side</span><span>: </span><span style=color:#b48ead>f64 </span><span>}
+</span><span>
+</span><span style=color:#b48ead>impl </span><span>Shape </span><span style=color:#b48ead>for </span><span>Square {
+</span><span>    </span><span style=color:#b48ead>fn </span><span style=color:#8fa1b3>area</span><span>(&</span><span style=color:#bf616a>self</span><span>) -> </span><span style=color:#b48ead>f64 </span><span>{ </span><span style=color:#bf616a>self</span><span>.side * </span><span style=color:#bf616a>self</span><span>.side }
+</span><span>}
+</span></code></pre><p>The trait defines <code>get_area()</code> with a default implementation that calls <code>area()</code>. Types implementing the trait only need to provide <code>area()</code>. Same result as CRTP, cleaner syntax.<p>Trait methods are statically dispatched unless you explicitly opt into dynamic dispatch with <code>dyn Trait</code>. When you call <code>s.get_area()</code> on a concrete type, the compiler knows the type and inlines the call. This static dispatch uses monomorphization: the compiler generates specialized code for each concrete type, just like C++ templates. The tradeoff is the same: zero runtime overhead, but increased compile times and binary size when you have many concrete types.<p>When you <em>do</em> need runtime polymorphism:<pre class=language-rust data-lang=rust style=color:#c0c5ce;background-color:#2b303b><code class=language-rust data-lang=rust><span style=color:#b48ead>fn </span><span style=color:#8fa1b3>total_area</span><span>(</span><span style=color:#bf616a>shapes</span><span>: &[&dyn Shape]) -> </span><span style=color:#b48ead>f64 </span><span>{
+</span><span>    shapes.</span><span style=color:#96b5b4>iter</span><span>().</span><span style=color:#96b5b4>map</span><span>(|</span><span style=color:#bf616a>s</span><span>| s.</span><span style=color:#96b5b4>get_area</span><span>()).</span><span style=color:#96b5b4>sum</span><span>()  </span><span style=color:#65737e>// Dynamic dispatch
+</span><span>}
+</span></code></pre><p>This pays similar costs to C++ virtual dispatch.<h3 id=memory-layout-differences>Memory layout differences</h3><p>Rust's trait objects are "fat pointers": two pointers bundled together (one to the data, one to the vtable). C++ embeds the vtable pointer in the object itself. This has concrete implications:<pre class=language-rust data-lang=rust style=color:#c0c5ce;background-color:#2b303b><code class=language-rust data-lang=rust><span style=color:#b48ead>use </span><span>std::mem::size_of;
+</span><span>
+</span><span style=color:#b48ead>struct </span><span>Square { </span><span style=color:#bf616a>side</span><span>: </span><span style=color:#b48ead>f64 </span><span>}
+</span><span>
+</span><span style=color:#65737e>// Square itself: 8 bytes (just the f64)
+</span><span style=color:#65737e>// &Square: 8 bytes (one pointer)
+</span><span style=color:#65737e>// &dyn Shape: 16 bytes (data ptr + vtable ptr, both in the reference)
+</span><span style=color:#65737e>// Box&lt;dyn Shape>: 16 bytes (same fat pointer layout)
+</span></code></pre><p>The vtable pointer lives in the <code>Box&lt;dyn Shape></code>, not in the <code>Square</code>. The <code>Square</code> on the heap is still just 8 bytes.<p>Compare to C++:<pre class=language-cpp data-lang=cpp style=color:#c0c5ce;background-color:#2b303b><code class=language-cpp data-lang=cpp><span style=color:#b48ead>struct </span><span>Square { </span><span style=color:#b48ead>double</span><span> side; };                    </span><span style=color:#65737e>// 8 bytes
+</span><span style=color:#b48ead>struct </span><span>VirtualSquare : </span><span style=color:#a3be8c>Shape </span><span>{ </span><span style=color:#b48ead>double</span><span> side; };    </span><span style=color:#65737e>// 16 bytes (vtable ptr embedded in object)
+</span><span>Square* p;                                         </span><span style=color:#65737e>// 8 bytes, points to 8-byte object
+</span><span>VirtualSquare* vp;                                 </span><span style=color:#65737e>// 8 bytes, points to 16-byte object
+</span></code></pre><p>In C++, the vtable pointer is inside the object, so <code>VirtualSquare</code> is 16 bytes even though it only has one <code>double</code> field.<p>This affects collections: Rust's <code>Vec&lt;Box&lt;dyn Shape>></code> stores 16-byte fat pointers to 8-byte objects, while C++'s <code>vector&lt;unique_ptr&lt;Shape>></code> stores 8-byte pointers to 16-byte objects. Same total memory (24 bytes per element), different cache behavior. When iterating, Rust loads 16 bytes per element from the vector, then chases one pointer to the 8-byte object. C++ loads 8 bytes per element, then chases one pointer to a 16-byte object. Rust's approach keeps objects smaller and potentially more cache-friendly when you're accessing the objects themselves; C++ keeps the pointer array denser, which matters when you're scanning pointers without dereferencing. In practice, the difference is usually negligible unless you're in a very tight loop. With C++ multiple inheritance, objects can have multiple vtable pointers, making the comparison more nuanced.<h3 id=fluent-builders-without-crtp>Fluent builders without CRTP</h3><p>The fluent builder pattern (where methods return the concrete type for chaining) doesn't require CRTP in Rust. The <code>Self</code> type handles it:<pre class=language-rust data-lang=rust style=color:#c0c5ce;background-color:#2b303b><code class=language-rust data-lang=rust><span style=color:#b48ead>struct </span><span>WidgetBuilder {
+</span><span>    </span><span style=color:#bf616a>name</span><span>: String,
+</span><span>    </span><span style=color:#bf616a>size</span><span>: </span><span style=color:#b48ead>i32</span><span>,
+</span><span>}
+</span><span>
+</span><span style=color:#b48ead>impl </span><span>WidgetBuilder {
+</span><span>    </span><span style=color:#b48ead>fn </span><span style=color:#8fa1b3>new</span><span>() -> </span><span style=color:#b48ead>Self </span><span>{
+</span><span>        </span><span style=color:#b48ead>Self </span><span>{ name: String::new(), size: </span><span style=color:#d08770>0 </span><span>}
+</span><span>    }
+</span><span>    
+</span><span>    </span><span style=color:#b48ead>fn </span><span style=color:#8fa1b3>set_name</span><span>(</span><span style=color:#b48ead>mut </span><span style=color:#bf616a>self</span><span>, </span><span style=color:#bf616a>name</span><span>: impl Into&lt;String>) -> </span><span style=color:#b48ead>Self </span><span>{
+</span><span>        </span><span style=color:#bf616a>self</span><span>.name = name.</span><span style=color:#96b5b4>into</span><span>();
+</span><span>        </span><span style=color:#bf616a>self
+</span><span>    }
+</span><span>    
+</span><span>    </span><span style=color:#b48ead>fn </span><span style=color:#8fa1b3>set_size</span><span>(</span><span style=color:#b48ead>mut </span><span style=color:#bf616a>self</span><span>, </span><span style=color:#bf616a>size</span><span>: </span><span style=color:#b48ead>i32</span><span>) -> </span><span style=color:#b48ead>Self </span><span>{
+</span><span>        </span><span style=color:#bf616a>self</span><span>.size = size;
+</span><span>        </span><span style=color:#bf616a>self
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style=color:#b48ead>let</span><span> builder = WidgetBuilder::new().</span><span style=color:#96b5b4>set_name</span><span>("</span><span style=color:#a3be8c>foo</span><span>").</span><span style=color:#96b5b4>set_size</span><span>(</span><span style=color:#d08770>42</span><span>);
+</span></code></pre><p>If you want shared builder behavior across types, you can use a trait with <code>Self</code>:<pre class=language-rust data-lang=rust style=color:#c0c5ce;background-color:#2b303b><code class=language-rust data-lang=rust><span style=color:#b48ead>trait </span><span>BuilderExt: Sized {
+</span><span>    </span><span style=color:#b48ead>fn </span><span style=color:#8fa1b3>name_mut</span><span>(&</span><span style=color:#b48ead>mut </span><span style=color:#bf616a>self</span><span>) -> &</span><span style=color:#b48ead>mut</span><span> String;
+</span><span>    
+</span><span>    </span><span style=color:#b48ead>fn </span><span style=color:#8fa1b3>set_name</span><span>(</span><span style=color:#b48ead>mut </span><span style=color:#bf616a>self</span><span>, </span><span style=color:#bf616a>name</span><span>: impl Into&lt;String>) -> </span><span style=color:#b48ead>Self </span><span>{
+</span><span>        *</span><span style=color:#bf616a>self</span><span>.</span><span style=color:#96b5b4>name_mut</span><span>() = name.</span><span style=color:#96b5b4>into</span><span>();
+</span><span>        </span><span style=color:#bf616a>self
+</span><span>    }
+</span><span>}
+</span></code></pre><p>This isn't a perfect equivalent to CRTP (you can't easily share field access without additional machinery), but it covers the common cases without template recursion.<h3 id=extension-traits-more-powerful-than-crtp-mixins>Extension traits: more powerful than CRTP mixins</h3><p>Unlike CRTP, Rust traits can be added to types you don't control, after the fact (though the <a href=https://doc.rust-lang.org/reference/items/implementations.html#orphan-rules>orphan rule</a> sometimes requires workarounds):<pre class=language-rust data-lang=rust style=color:#c0c5ce;background-color:#2b303b><code class=language-rust data-lang=rust><span style=color:#65737e>// CRTP mixin in C++ requires inheritance at definition time:
+</span><span style=color:#65737e>// struct Widget : Printable&lt;Widget> { ... };
+</span><span>
+</span><span style=color:#65737e>// Rust extension trait:
+</span><span style=color:#b48ead>trait </span><span>Printable: std::fmt::Display {
+</span><span>    </span><span style=color:#b48ead>fn </span><span style=color:#8fa1b3>print</span><span>(&</span><span style=color:#bf616a>self</span><span>) {
+</span><span>        println!("</span><span style=color:#d08770>{}</span><span>", </span><span style=color:#bf616a>self</span><span>);
+</span><span>    }
+</span><span>}
+</span><span>
+</span><span style=color:#65737e>// Blanket impl: ANY type implementing Display gets print() for free
+</span><span style=color:#b48ead>impl</span><span>&lt;T: std::fmt::Display> Printable </span><span style=color:#b48ead>for </span><span>T {}
+</span><span>
+</span><span style=color:#65737e>// No inheritance required: String, i32, your custom types all get print()
+</span><span style=color:#b48ead>fn </span><span style=color:#8fa1b3>demo</span><span>() {
+</span><span>    "</span><span style=color:#a3be8c>hello</span><span>".</span><span style=color:#96b5b4>print</span><span>();
+</span><span>    </span><span style=color:#d08770>42.</span><span style=color:#96b5b4>print</span><span>();
+</span><span>}
+</span></code></pre><p>This is genuinely more powerful. You can extend the standard library, third-party crates, or your own types uniformly. With CRTP, you'd have to modify every type's inheritance hierarchy.<p>The key difference: Rust makes static dispatch the default and dynamic dispatch opt-in. C++ virtual functions are dynamic by default.<h2 id=conclusion>Conclusion</h2><p>Virtual functions are the default for good reason: they're flexible and the overhead rarely matters. When performance matters and you have concrete types, <code>final</code> is the first thing to try.<p>CRTP is for when you need the base class to know the derived type. It's not primarily a performance optimization; it's a pattern for type-aware base classes that happens to avoid virtual dispatch.<p>Rust's traits provide all of this more cleanly: default implementations, static dispatch by default, extensibility without inheritance. The CRTP pattern simply isn't needed.<h2 id=appendix-raw-benchmark-output>Appendix: raw benchmark output</h2><p>For nerds who don't trust summary tables.<p>Machine: <a href=/blog/my-metal/#hetzner-cloud-cax21>Hetzner Cloud CAX21</a> (ARM Neoverse-N1, 4 vCPUs @ 2.5GHz), Fedora 43, clang 21.1.8.<h3 id=direct>Direct</h3><pre style=color:#c0c5ce;background-color:#2b303b><code><span>$ perf stat -e cycles,instructions,cache-misses,branch-misses \
+</span><span>    ./bench_direct --benchmark_repetitions=50 --benchmark_report_aggregates_only=true
+</span><span>------------------------------------------------------------
+</span><span>Benchmark                  Time             CPU   Iterations
+</span><span>------------------------------------------------------------
+</span><span>bmDirect_mean           8783 ns         8753 ns           50
+</span><span>bmDirect_median         8773 ns         8744 ns           50
+</span><span>bmDirect_stddev         32.5 ns         31.0 ns           50
+</span><span>bmDirect_cv             0.37 %          0.35 %            50
+</span><span>
+</span><span> Performance counter stats for './bench_direct [...]':
+</span><span>
+</span><span>   104,064,362,763      cycles:u
+</span><span>   240,684,872,065      instructions:u            #    2.31  insn per cycle
+</span><span>       376,541,888      cache-misses:u
+</span><span>         4,081,565      branch-misses:u
+</span><span>
+</span><span>      35.236795742 seconds time elapsed
+</span></code></pre><h3 id=crtp>CRTP</h3><pre style=color:#c0c5ce;background-color:#2b303b><code><span>$ perf stat -e cycles,instructions,cache-misses,branch-misses \
+</span><span>    ./bench_crtp --benchmark_repetitions=50 --benchmark_report_aggregates_only=true
+</span><span>------------------------------------------------------------
+</span><span>Benchmark                  Time             CPU   Iterations
+</span><span>------------------------------------------------------------
+</span><span>bmCrtp_mean             8765 ns         8737 ns           50
+</span><span>bmCrtp_median           8762 ns         8734 ns           50
+</span><span>bmCrtp_stddev           12.6 ns         11.7 ns           50
+</span><span>bmCrtp_cv               0.14 %          0.13 %            50
+</span><span>
+</span><span> Performance counter stats for './bench_crtp [...]':
+</span><span>
+</span><span>   104,364,572,397      cycles:u
+</span><span>   241,380,965,818      instructions:u            #    2.31  insn per cycle
+</span><span>       371,367,469      cache-misses:u
+</span><span>         4,091,475      branch-misses:u
+</span><span>
+</span><span>      35.266632976 seconds time elapsed
+</span></code></pre><h3 id=virtual>Virtual</h3><pre style=color:#c0c5ce;background-color:#2b303b><code><span>$ perf stat -e cycles,instructions,cache-misses,branch-misses \
+</span><span>    ./bench_virtual --benchmark_repetitions=50 --benchmark_report_aggregates_only=true \
+</span><span>    --benchmark_filter=bmVirtualDirect
+</span><span>-----------------------------------------------------------------
+</span><span>Benchmark                       Time             CPU   Iterations
+</span><span>-----------------------------------------------------------------
+</span><span>bmVirtualDirect_mean        24675 ns        24591 ns           50
+</span><span>bmVirtualDirect_median      24678 ns        24592 ns           50
+</span><span>bmVirtualDirect_stddev       29.7 ns         27.2 ns           50
+</span><span>bmVirtualDirect_cv           0.12 %          0.11 %            50
+</span><span>
+</span><span> Performance counter stats for './bench_virtual [...]':
+</span><span>
+</span><span>   104,903,758,723      cycles:u
+</span><span>   186,846,046,795      instructions:u            #    1.78  insn per cycle
+</span><span>       225,974,315      cache-misses:u
+</span><span>         1,512,763      branch-misses:u
+</span><span>
+</span><span>      35.496489852 seconds time elapsed
+</span></code></pre><pre style=color:#c0c5ce;background-color:#2b303b><code><span>$ perf stat -e cycles,instructions,cache-misses,branch-misses \
+</span><span>    ./bench_virtual --benchmark_repetitions=50 --benchmark_report_aggregates_only=true \
+</span><span>    --benchmark_filter=bmVirtualHomogeneous
+</span><span>----------------------------------------------------------------------
+</span><span>Benchmark                            Time             CPU   Iterations
+</span><span>----------------------------------------------------------------------
+</span><span>bmVirtualHomogeneous_mean        25992 ns        25879 ns           50
+</span><span>bmVirtualHomogeneous_median      25987 ns        25866 ns           50
+</span><span>bmVirtualHomogeneous_stddev       44.2 ns         40.5 ns           50
+</span><span>bmVirtualHomogeneous_cv           0.17 %          0.16 %            50
+</span><span>
+</span><span> Performance counter stats for './bench_virtual [...]':
+</span><span>
+</span><span>   104,791,163,245      cycles:u
+</span><span>   164,210,116,554      instructions:u            #    1.57  insn per cycle
+</span><span>       629,148,412      cache-misses:u
+</span><span>         1,458,236      branch-misses:u
+</span><span>
+</span><span>      35.548482083 seconds time elapsed
+</span></code></pre><pre style=color:#c0c5ce;background-color:#2b303b><code><span>$ perf stat -e cycles,instructions,cache-misses,branch-misses \
+</span><span>    ./bench_virtual --benchmark_repetitions=50 --benchmark_report_aggregates_only=true \
+</span><span>    --benchmark_filter=bmVirtualHeterogeneous
+</span><span>------------------------------------------------------------------------
+</span><span>Benchmark                              Time             CPU   Iterations
+</span><span>------------------------------------------------------------------------
+</span><span>bmVirtualHeterogeneous_mean        60911 ns        60617 ns           50
+</span><span>bmVirtualHeterogeneous_median      60868 ns        60578 ns           50
+</span><span>bmVirtualHeterogeneous_stddev        247 ns          237 ns           50
+</span><span>bmVirtualHeterogeneous_cv           0.41 %          0.39 %            50
+</span><span>
+</span><span> Performance counter stats for './bench_virtual [...]':
+</span><span>
+</span><span>   103,195,442,604      cycles:u
+</span><span>    75,236,253,650      instructions:u            #    0.73  insn per cycle
+</span><span>       249,445,342      cache-misses:u
+</span><span>     2,846,025,503      branch-misses:u
+</span><span>
+</span><span>      35.154729549 seconds time elapsed
+</span></code></pre><h3 id=final>Final</h3><pre style=color:#c0c5ce;background-color:#2b303b><code><span>$ perf stat -e cycles,instructions,cache-misses,branch-misses \
+</span><span>    ./bench_final --benchmark_repetitions=50 --benchmark_report_aggregates_only=true \
+</span><span>    --benchmark_filter=bmFinalDirect
+</span><span>---------------------------------------------------------------
+</span><span>Benchmark                     Time             CPU   Iterations
+</span><span>---------------------------------------------------------------
+</span><span>bmFinalDirect_mean         7108 ns         7084 ns           50
+</span><span>bmFinalDirect_median       7102 ns         7078 ns           50
+</span><span>bmFinalDirect_stddev       20.4 ns         19.7 ns           50
+</span><span>bmFinalDirect_cv           0.29 %          0.28 %            50
+</span><span>
+</span><span> Performance counter stats for './bench_final [...]':
+</span><span>
+</span><span>   102,930,322,685      cycles:u
+</span><span>   171,631,602,734      instructions:u            #    1.67  insn per cycle
+</span><span>       726,534,697      cache-misses:u
+</span><span>         5,517,593      branch-misses:u
+</span><span>
+</span><span>      34.847815132 seconds time elapsed
+</span></code></pre><pre style=color:#c0c5ce;background-color:#2b303b><code><span>$ perf stat -e cycles,instructions,cache-misses,branch-misses \
+</span><span>    ./bench_final --benchmark_repetitions=50 --benchmark_report_aggregates_only=true \
+</span><span>    --benchmark_filter=bmFinalHomogeneous
+</span><span>--------------------------------------------------------------------
+</span><span>Benchmark                          Time             CPU   Iterations
+</span><span>--------------------------------------------------------------------
+</span><span>bmFinalHomogeneous_mean        25744 ns        25642 ns           50
+</span><span>bmFinalHomogeneous_median      25751 ns        25650 ns           50
+</span><span>bmFinalHomogeneous_stddev       45.4 ns         43.1 ns           50
+</span><span>bmFinalHomogeneous_cv           0.18 %          0.17 %            50
+</span><span>
+</span><span> Performance counter stats for './bench_final [...]':
+</span><span>
+</span><span>   104,235,049,545      cycles:u
+</span><span>   164,972,163,246      instructions:u            #    1.58  insn per cycle
+</span><span>       592,234,866      cache-misses:u
+</span><span>         1,461,272      branch-misses:u
+</span><span>
+</span><span>      35.375672852 seconds time elapsed
+</span></code></pre><pre style=color:#c0c5ce;background-color:#2b303b><code><span>$ perf stat -e cycles,instructions,cache-misses,branch-misses \
+</span><span>    ./bench_final --benchmark_repetitions=50 --benchmark_report_aggregates_only=true \
+</span><span>    --benchmark_filter=bmFinalHeterogeneous
+</span><span>----------------------------------------------------------------------
+</span><span>Benchmark                            Time             CPU   Iterations
+</span><span>----------------------------------------------------------------------
+</span><span>bmFinalHeterogeneous_mean        61397 ns        61117 ns           50
+</span><span>bmFinalHeterogeneous_median      61328 ns        61055 ns           50
+</span><span>bmFinalHeterogeneous_stddev        194 ns          177 ns           50
+</span><span>bmFinalHeterogeneous_cv           0.32 %          0.29 %            50
+</span><span>
+</span><span> Performance counter stats for './bench_final [...]':
+</span><span>
+</span><span>   104,225,776,685      cycles:u
+</span><span>    75,197,253,469      instructions:u            #    0.72  insn per cycle
+</span><span>       260,211,222      cache-misses:u
+</span><span>     2,858,405,370      branch-misses:u
+</span><span>
+</span><span>      35.415437967 seconds time elapsed
+</span></code></pre></article><nav class=post-navigation><header class=post-navigation-title><h2>Read More Posts</h2><hr></header><div class=post-navigation-buttons><a aria-label="Prev article" href=https://waifod.dev/blog/my-metal/ rel=prev> <span aria-hidden=true>[</span>My metal<span aria-hidden=true>] ></span> </a></div></nav></main><footer class=footer><address class=socials><ul><li><a aria-label="atom feed" title="atom feed" class=social-link href=https://waifod.dev/atom.xml> <svg aria-label="feed icon" role=img><use aria-hidden=true href=https://waifod.dev/images/social_icons/atom.svg#icon /></svg> </a><li><a aria-label=github class=social-link href=https://github.com/waifod rel=me title=github> <svg aria-label="github icon" role=img><use aria-hidden=true href=https://waifod.dev/images/social_icons/github.svg#icon /></svg> </a><li><a aria-label=linkedin class=social-link href=https://www.linkedin.com/in/waifod/ rel=me title=linkedin> <svg aria-label="linkedin icon" role=img><use aria-hidden=true href=https://waifod.dev/images/social_icons/linkedin.svg#icon /></svg> </a><li><a aria-label=email class=social-link href=mailto:waifod@pm.me rel=me title=email> <svg aria-label="email icon" role=img><use aria-hidden=true href=https://waifod.dev/images/social_icons/email.svg#icon /></svg> </a></ul></address><p class=copyright><span>© <time>2026</time> Matteo Durante</span> <span>Powered by <a href=https://www.getzola.org>Zola</a></span> <span>Theme by <a href=https://eyalkalderon.com>ebkalderon</a></span></footer>
