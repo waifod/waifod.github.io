@@ -32,8 +32,8 @@ struct Shape {
 };
 
 struct Square : Shape {
-    double side;
-    double getArea() const override { return side * side; }
+    double side_;
+    double getArea() const override { return side_ * side_; }
 };
 ```
 
@@ -48,7 +48,7 @@ When the compiler generates code for a call to `getArea()` through a `Shape*`, i
 
 For hot paths, this adds up. More importantly, inlining enables further optimizations (constant propagation, dead code elimination, loop unrolling) that don't work across indirect calls.
 
-There's also a memory cost: virtual classes embed a vtable pointer in each object. A `Square` with just `double side` goes from 8 to 16 bytes with virtuals. This affects cache utilization and can matter more than dispatch overhead for small objects in tight loops.
+There's also a memory cost: virtual classes embed a vtable pointer in each object. A `Square` with just `double side_` goes from 8 to 16 bytes with virtuals. This affects cache utilization and can matter more than dispatch overhead for small objects in tight loops.
 
 That said, 3x slower on a microbenchmark doesn't mean 3x slower application. If you're calling a virtual function once per user click, the overhead is nanoseconds. The performance argument applies to tight loops, not general architecture.
 
@@ -58,8 +58,8 @@ C++11's `final` prevents a class from being inherited or a virtual function from
 
 ```cpp
 struct SquareFinal final : Shape {
-    double side;
-    double getArea() const override { return side * side; }
+    double side_;
+    double getArea() const override { return side_ * side_; }
 };
 ```
 
@@ -69,8 +69,8 @@ You can also mark individual methods `final` while leaving the class open:
 
 ```cpp
 struct Square : Shape {
-    double side;
-    double getArea() const override final { return side * side; }
+    double side_;
+    double getArea() const override final { return side_ * side_; }
 };
 ```
 
@@ -141,13 +141,13 @@ struct Shape {
 };
 
 struct Square : Shape<Square> {
-    double side;
-    double area() const { return side * side; }
+    double side_;
+    double area() const { return side_ * side_; }
 };
 
 struct Triangle : Shape<Triangle> {
-    double base, height;
-    double area() const { return 0.5 * base * height; }
+    double base_, height_;
+    double area() const { return 0.5 * base_ * height_; }
 };
 ```
 
@@ -188,18 +188,18 @@ struct Gadget : Counted<Gadget> {};
 ```cpp
 template<typename Derived>
 struct Builder {
-    std::string name;
+    std::string name_;
     
     Derived& set_name(std::string n) {
-        name = std::move(n);
+        name_ = std::move(n);
         return static_cast<Derived&>(*this);
     }
 };
 
 struct WidgetBuilder : Builder<WidgetBuilder> {
-    int size = 0;
+    int size_ = 0;
     
-    WidgetBuilder& set_size(int s) { size = s; return *this; }
+    WidgetBuilder& set_size(int s) { size_ = s; return *this; }
 };
 
 auto b = WidgetBuilder{}.set_name("foo").set_size(42);  // Chaining works
@@ -225,9 +225,9 @@ struct Comparable {
 };
 
 struct Widget : Printable<Widget>, Comparable<Widget> {
-    std::string name;
-    std::string to_string() const { return name; }
-    bool operator==(const Widget& other) const { return name == other.name; }
+    std::string name_;
+    std::string to_string() const { return name_; }
+    bool operator==(const Widget& other) const { return name_ == other.name_; }
 };
 ```
 
@@ -364,9 +364,9 @@ To confirm this is a benchmark artifact, let's remove the harness entirely:
 constexpr std::size_t kNumShapes = 10000;
 
 struct Square {
-    double side;
-    explicit Square(double s) : side(s) {}
-    double getArea() const { return side * side; }
+    double side_;
+    explicit Square(double s) : side_(s) {}
+    double getArea() const { return side_ * side_; }
 };
 
 // noinline prevents the compiler from inlining sumAreas into main,
@@ -508,8 +508,8 @@ The vtable pointer lives in the `Box<dyn Shape>`, not in the `Square`. The `Squa
 Compare to C++:
 
 ```cpp
-struct Square { double side; };                    // 8 bytes
-struct VirtualSquare : Shape { double side; };     // 16 bytes (vtable ptr embedded in object)
+struct Square { double side_; };                    // 8 bytes
+struct VirtualSquare : Shape { double side_; };     // 16 bytes (vtable ptr embedded in object)
 Square* p;                                         // 8 bytes, points to 8-byte object
 VirtualSquare* vp;                                 // 8 bytes, points to 16-byte object
 ```
