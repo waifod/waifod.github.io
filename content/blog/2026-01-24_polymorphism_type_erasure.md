@@ -4,6 +4,9 @@ date = 2026-01-24
 
 [taxonomies]
 tags = ["c++", "rust", "programming", "patterns"]
+
+[extra]
+toc = true
 +++
 
 In which I teach myself C++ type erasure, and discover why Rust's trait system makes most of it unnecessary.
