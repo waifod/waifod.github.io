@@ -13,25 +13,26 @@ In which I teach myself C++ type erasure, and discover why Rust's trait system m
 
 <!-- more -->
 
-## The problem: polymorphism and its limitations
+## The problem
 
-Let's start with a simple problem: you want to calculate areas of different shapes. The traditional object-oriented solution uses inheritance and virtual functions.
+Say you want to implement a `Shape` class with an `area()` method. You have circles, squares, maybe triangles later. The obvious approach is inheritance: define a base class, override the virtual method, store pointers in a container. It works, but now your API is littered with `unique_ptr` and heap allocations are visible to callers. What if you want the same polymorphic behavior but with value semantics, where the memory management is an implementation detail, not part of your interface?
 
-### Classic dynamic polymorphism
+That's the problem type erasure solves. We'll start from the familiar virtual function approach, see where it falls short, and build up to a technique that gives you polymorphism without exposing the plumbing.
 
-C++ with virtual functions:
+## Classic dynamic polymorphism
+
+The traditional object-oriented solution uses inheritance and virtual functions. We start with an interface:
 
 ```cpp
-#include <cmath>
-#include <iostream>
-#include <vector>
-#include <memory>
-
 struct Shape {
     virtual ~Shape() = default;
     virtual double area() const = 0;
 };
+```
 
+Then add `Circle` and `Square`:
+
+```cpp
 struct Circle : Shape {
     double radius_;
     Circle(double r) : radius_(r) {}
@@ -43,7 +44,11 @@ struct Square : Shape {
     Square(double s) : side_(s) {}
     double area() const override { return side_ * side_; }
 };
+```
 
+Now we can store different shapes in a container and use them generically:
+
+```cpp
 int main() {
     std::vector<std::unique_ptr<Shape>> shapes;
     shapes.emplace_back(std::make_unique<Circle>(5.0));
@@ -55,7 +60,7 @@ int main() {
 }
 ```
 
-Rust with trait objects:
+The Rust version looks similar:
 
 ```rust
 use std::f64::consts::PI;
@@ -88,26 +93,33 @@ fn main() {
 }
 ```
 
-This works, but it has limitations:
+This works, but notice the `unique_ptr` and `Box` in the container types. The pointer semantics are baked into your API. There's also a second limitation in C++: types must inherit from the base class, so you can't make existing types polymorphic without modifying them.
 
-1. Pointer semantics - you must use pointers/references (`std::unique_ptr`, `Box`) in your API;
-2. Intrusive - types must inherit from the base class (C++) or implement the trait (Rust).
+## Template-based polymorphism
 
-What if you want polymorphism with value semantics at the API level?
+If types can't share a base class, you might reach for templates instead:
+
+```cpp
+void print_area(const auto& shape) {
+    std::cout << "Area: " << shape.area() << "\n";
+}
+```
+
+This works for any type with an `area()` method, no inheritance required. Templates generate code for each type you use, so if you pass something without `area()`, the compiler errors when it tries to instantiate the template. But it has two problems.
+
+First, there's no common type. Each template instantiation is distinct, so you can't store a mix of `Circle` and `Square` in one container:
+
+```cpp
+std::vector<???> shapes;  // What type goes here?
+```
+
+Second, templates are viral. Any function that calls `print_area` must either know the concrete type or be a template itself. This spreads templates across the codebase, making it harder to read and increasing compile times and binary size.
 
 ## External polymorphism
 
-In C++, traditional polymorphism has a fundamental limitation: types must inherit from a base class. This is *intrusive*: you can't make existing types polymorphic without modifying them.
-
-External polymorphism solves this by wrapping types in a polymorphic interface. This is also the first step toward type erasure:
+External polymorphism addresses the intrusiveness problem. If you have types that don't share a base class, you can wrap them in a polymorphic interface and treat them uniformly. Say `Circle` and `Square` don't inherit from anything:
 
 ```cpp
-#include <cmath>
-#include <iostream>
-#include <memory>
-#include <vector>
-
-// Existing types - they don't inherit from anything
 struct Circle {
     double radius;
     double area() const { return M_PI * radius * radius; }
@@ -117,8 +129,11 @@ struct Square {
     double side;
     double area() const { return side * side; }
 };
+```
 
-// External polymorphism: wrap types in a polymorphic interface
+We define a wrapper interface and a templated implementation that forwards to the wrapped object:
+
+```cpp
 struct ShapeWrapper {
     virtual ~ShapeWrapper() = default;
     virtual double area() const = 0;
@@ -130,7 +145,11 @@ struct ShapeWrapperImpl : ShapeWrapper {
     ShapeWrapperImpl(T s) : shape_(std::move(s)) {}
     double area() const override { return shape_.area(); }
 };
+```
 
+Now we can store `Circle` and `Square` in the same container:
+
+```cpp
 int main() {
     std::vector<std::unique_ptr<ShapeWrapper>> shapes;
     shapes.emplace_back(std::make_unique<ShapeWrapperImpl<Circle>>(Circle{5.0}));
@@ -142,7 +161,7 @@ int main() {
 }
 ```
 
-This pattern lets you add polymorphism to types you don't control. But it still exposes pointers in your API.
+This pattern lets you add polymorphism to types you don't control, but it still exposes pointers in your API.
 
 Rust doesn't need this pattern because traits are *non-intrusive* by design. You can implement traits for types without modifying them[^newtype]:
 
@@ -166,7 +185,7 @@ This is a key difference: C++ needs the external polymorphism pattern as a worka
 
 ## Enter type erasure
 
-Type erasure solves a specific problem: how do you get polymorphic behavior with value semantics at the API level?
+We've solved intrusiveness, but pointers are still visible in the API. Type erasure hides them.
 
 Consider `std::function` in C++:
 
@@ -192,26 +211,21 @@ Notice:
 - no inheritance required;
 - the concrete type is "erased" behind `std::function`.
 
-This is type erasure: hiding the concrete type behind a uniform interface while maintaining *value semantics*.
+This is type erasure: the concrete type is hidden behind a uniform interface, and callers use value semantics.
 
 {% alert(type="note") %}
-Type erasure gives you value semantics at the API level. The heap allocation still happens with the naive approach, but it's an implementation detail hidden from callers.
+The heap allocation still happens internally, but it's an implementation detail hidden from callers.
 {% end %}
 
 ## Implementing type erasure
 
-Now let's see how each language implements type erasure.
-
 ### C++: the manual approach
 
-C++ doesn't provide type erasure as a language feature, and instead you implement it using the "external polymorphism" pattern (see Sean Parent's [*Inheritance Is The Base Class of Evil*](https://www.youtube.com/watch?v=2bLkxj6EVoM) talk and Klaus Iglberger's [*C++ Software Design*](https://www.oreilly.com/library/view/c-software-design/9781098113155/) for in-depth treatments):
+C++ doesn't provide type erasure as a language feature, and instead you implement it using the "external polymorphism" pattern (see Sean Parent's [*Inheritance Is The Base Class of Evil*](https://www.youtube.com/watch?v=2bLkxj6EVoM) talk and Klaus Iglberger's [*C++ Software Design*](https://www.oreilly.com/library/view/c-software-design/9781098113155/) for in-depth treatments).
+
+The idea is to nest the polymorphic machinery inside a value-semantic wrapper. First, define a `Concept` (the interface) and a templated `Model` (the wrapper):
 
 ```cpp
-#include <cmath>
-#include <memory>
-#include <iostream>
-#include <vector>
-
 struct Shape {
     struct Concept {
         virtual ~Concept() = default;
@@ -232,8 +246,11 @@ struct Shape {
     
     double area() const { return object->area(); }
 };
+```
 
-// Concrete types - no inheritance required
+`Circle` and `Square` don't need to inherit from anything:
+
+```cpp
 struct Circle {
     double radius;
     double area() const { return M_PI * radius * radius; }
@@ -243,9 +260,13 @@ struct Square {
     double side;
     double area() const { return side * side; }
 };
+```
 
+And now we get value semantics at the API level:
+
+```cpp
 int main() {
-    std::vector<Shape> shapes;  // Value semantics!
+    std::vector<Shape> shapes;  // No pointers!
     shapes.emplace_back(Circle{5.0});
     shapes.emplace_back(Square{4.0});
     
@@ -254,6 +275,8 @@ int main() {
     }
 }
 ```
+
+Look at `main()`: no `unique_ptr`, no template parameters at the call site, just `Shape`. The polymorphic machinery is entirely hidden.
 
 The pattern requires some boilerplate: a `Concept` base class, a templated `Model` that wraps concrete types, and a `unique_ptr` to hide the heap allocation. These names ("Concept" and "Model") are the standard terminology for this pattern. The template constructor accepts any type with the required methods, and type checking happens at template instantiation.
 
@@ -324,9 +347,9 @@ fn main() {
 Now you have `Vec<Shape>` instead of `Vec<Box<dyn Shape>>`. This gives you:
 - a cleaner public API;
 - the ability to add methods to `Shape` that aren't on the trait;
-- encapsulation - the `Box` is an implementation detail you could change later.
+- encapsulation: the `Box` is an implementation detail you could change later.
 
-The tradeoff is that you lose flexibility at call sites. With `Box<dyn Trait>` directly, callers can choose between `Box`, `Rc`, or references depending on their needs.
+The tradeoff is that you lose flexibility at call sites: with `Box<dyn Trait>` directly, callers can choose between `Box`, `Rc`, or references depending on their needs.
 
 In practice, this C++-style wrapper pattern is rare in Rust. The trait system's flexibility and non-intrusiveness means `Box<dyn Trait>` is usually good enough, and the extra indirection of a wrapper struct doesn't buy you much.
 
@@ -334,14 +357,18 @@ In practice, this C++-style wrapper pattern is rare in Rust. The trait system's 
 
 Rust's built-in type erasure is convenient, but C++'s manual approach offers more flexibility in certain scenarios:
 
-1. **Small buffer optimization** - C++'s `std::function` stores small callables inline, avoiding heap allocation (see Raymond Chen's [explanation of how this works](https://devblogs.microsoft.com/oldnewthing/20200514-00/?p=103749)). Rust's `Box<dyn Trait>` always heap-allocates. To be clear: the custom type erasure implementation shown earlier in this post uses `unique_ptr`, which also heap-allocates. SBO is an optimization you'd have to implement yourself in either language. The difference is that C++ ships with it for the callable case via `std::function`, while Rust's standard library doesn't provide an equivalent.
+1. **Small buffer optimization** - C++'s `std::function` stores small callables inline, avoiding heap allocation (see Raymond Chen's [explanation of how this works](https://devblogs.microsoft.com/oldnewthing/20200514-00/?p=103749)). Rust's `Box<dyn Trait>` always heap-allocates[^sbo].
 
 2. **Custom storage** - C++'s manual approach gives you full control over how the erased type is stored. You can use arena allocation, custom allocators, or other memory layouts. Rust can do this too, but it's harder.
 
-3. **More flexible interface definition** - Rust trait objects have restrictions: traits with generic methods, methods returning `Self`, or methods taking `self` by value aren't object-safe. You also can't combine arbitrary traits - `dyn TraitA + TraitB` only works when `TraitB` is an auto trait like `Send` or `Sync`. C++ templates don't have these limitations since you control the `Concept` interface directly.
+3. **More flexible interface definition** - Rust trait objects have restrictions: traits with generic methods, methods returning `Self`, or methods taking `self` by value aren't [object-safe](https://doc.rust-lang.org/reference/items/traits.html#object-safety). You also can't combine arbitrary traits - `dyn TraitA + TraitB` only works when `TraitB` is an auto trait like `Send` or `Sync`. C++ templates don't have these limitations since you control the `Concept` interface directly.
 
 ## Conclusion
 
 C++ and Rust both support type erasure, but with different tradeoffs. Rust's `dyn Trait` makes the common case trivial: no boilerplate, non-intrusive traits, and the compiler handles the vtable. C++ requires manual implementation but offers more flexibility: no object safety restrictions, and `std::function` provides SBO out of the box for callables. For custom type erasure, both languages require extra effort if you want optimizations like SBO or custom storage.
 
 Code samples available on [GitHub](https://github.com/waifod/blog_code_samples/tree/main/2026-01-24_polymorphism_type_erasure).
+
+This post was inspired by David Álvarez Rosa's [*Deriving Type Erasure*](https://beta.alvarezrosa.com/posts/deriving-type-erasure/).
+
+[^sbo]: The custom type erasure implementation shown earlier in this post uses `unique_ptr`, which also heap-allocates. SBO is an optimization you'd have to implement yourself in either language. The difference is that C++ ships with it for the callable case via `std::function`, while Rust's standard library doesn't provide an equivalent.
