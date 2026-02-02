@@ -365,7 +365,7 @@ constexpr std::size_t kNumShapes = 10000;
 
 struct Square {
     double side_;
-    explicit Square(double s) : side_(s) {}
+    Square(double s) : side_(s) {}
     double getArea() const { return side_ * side_; }
 };
 
@@ -510,8 +510,8 @@ Compare to C++:
 ```cpp
 struct Square { double side_; };                    // 8 bytes
 struct VirtualSquare : Shape { double side_; };     // 16 bytes (vtable ptr embedded in object)
-Square* p;                                         // 8 bytes, points to 8-byte object
-VirtualSquare* vp;                                 // 8 bytes, points to 16-byte object
+Square* p;                                          // 8 bytes, points to 8-byte object
+VirtualSquare* vp;                                  // 8 bytes, points to 16-byte object
 ```
 
 In C++, the vtable pointer is inside the object, so `VirtualSquare` is 16 bytes even though it only has one `double` field.
