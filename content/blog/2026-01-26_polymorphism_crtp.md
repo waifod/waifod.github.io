@@ -126,7 +126,7 @@ Through base pointers (bmVirtualHomogeneous, bmFinalHomogeneous), `final` provid
 
 ## CRTP: when you need more
 
-The Curiously Recurring Template Pattern is more complex. Use it when `final` isn't enough, typically when you need type-aware base class functionality, not just performance.
+The Curiously Recurring Template Pattern is more complex. The name alone should tell you something: if your pattern needs "curiously" in the title, you're in for a ride. Use it when `final` isn't enough, typically when you need type-aware base class functionality, not just performance.
 
 ### The pattern
 
@@ -239,7 +239,7 @@ Before concepts, CRTP could enforce interfaces at compile time while providing d
 
 ### The downsides
 
-CRTP has rough edges:
+CRTP has rough edges.
 
 1. **Confusing syntax**: `class Derived : Base<Derived>` takes a moment to parse.
 2. **No heterogeneous collections**: each `Shape<Derived>` is a different type. You can't store `Shape<Square>` and `Shape<Triangle>` together without a common base, which brings back virtuals.
@@ -324,7 +324,7 @@ The CRTP version generates identical code (verified by comparing `bench_crtp.s`)
 
 ### Why bmFinalDirect is faster than bmDirect
 
-Remember the anomaly from the benchmarks: `final` (7108 ns) beat the non-polymorphic baseline (8783 ns) by 19%. The assembly shows why: bmFinalDirect vectorized while bmDirect didn't.
+Remember the anomaly from the benchmarks: `final` (7108 ns) beat the non-polymorphic baseline (8783 ns) by 19%. We're about to spend several paragraphs figuring out why. The assembly shows the answer: bmFinalDirect vectorized while bmDirect didn't.
 
 Here's the bmFinalDirect hot loop:
 
@@ -448,11 +448,11 @@ Out of curiosity, I tested randomly mixing squares and triangles:
 | bmVirtualHeterogeneous | 60911 | 6.9x | 4950 | 43 |
 | bmFinalHeterogeneous | 61397 | 7.0x | 5014 | 46 |
 
-This is ~7x slower than the direct baseline, but the comparison is unfair. **You can't do this without virtual dispatch.** Each `Shape<Derived>` is a different type, so you can't mix them without a common base class, which brings back virtual functions. The 7x shows the cost of genuine runtime polymorphism when the branch predictor can't learn a pattern, not a static alternative you're ignoring.
+~7x slower than the direct baseline, but the comparison is unfair. **You can't do this without virtual dispatch.** Each `Shape<Derived>` is a different type, so you can't mix them without a common base class, which brings back virtual functions. The 7x shows the cost of genuine runtime polymorphism when the branch predictor can't learn a pattern, not a static alternative you're ignoring.
 
 Note that `final` provides no benefit here: the compiler can't see through `Shape*` to know the concrete type, so it emits virtual dispatch regardless.
 
-This is the fundamental limitation of static polymorphism: you trade runtime flexibility for compile-time performance. If your design genuinely requires heterogeneous collections, virtual dispatch is the right tool. CRTP and `final` are optimizations for when you *don't* need that flexibility.
+Static polymorphism's fundamental limitation: you trade runtime flexibility for compile-time performance. If your design genuinely requires heterogeneous collections, virtual dispatch is the right tool. CRTP and `final` are optimizations for when you *don't* need that flexibility.
 
 ## Rust's approach
 
@@ -587,15 +587,15 @@ fn demo() {
 }
 ```
 
-This is genuinely more powerful. You can extend the standard library, third-party crates, or your own types uniformly. With CRTP, you'd have to modify every type's inheritance hierarchy.
+Extension traits are genuinely more powerful. You can extend the standard library, third-party crates, or your own types uniformly. With CRTP, you'd have to modify every type's inheritance hierarchy.
 
 The key difference: Rust makes static dispatch the default and dynamic dispatch opt-in. C++ virtual functions are dynamic by default.
 
 ## Conclusion
 
-Virtual functions are the default for good reason: they're flexible and the overhead rarely matters. When performance matters and you have concrete types, `final` is the first thing to try.
+Virtual functions are the default for good reason: they're flexible and the overhead rarely matters. When performance matters and you have concrete types, `final` is the first thing to try. It's boring, it works, and you can explain it to your coworkers.
 
-CRTP is for when you need the base class to know the derived type. It's not primarily a performance optimization; it's a pattern for type-aware base classes that happens to avoid virtual dispatch.
+CRTP is for when you need the base class to know the derived type. It's not primarily a performance optimization; it's a pattern for type-aware base classes that happens to avoid virtual dispatch. If you find yourself reaching for it just to avoid vtable overhead, you've probably overcomplicated things.
 
 Rust's traits provide all of this more cleanly: default implementations, static dispatch by default, extensibility without inheritance. The CRTP pattern simply isn't needed.
 

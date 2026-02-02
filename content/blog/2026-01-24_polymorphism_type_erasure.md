@@ -15,6 +15,8 @@ In which I teach myself C++ type erasure, and discover why Rust's trait system m
 
 ## The problem
 
+Type erasure is one of those techniques that sounds like it solves a problem you don't have until you have it.
+
 Say you want to implement a `Shape` class with an `area()` method. You have circles, squares, maybe triangles later. The obvious approach is inheritance: define a base class, override the virtual method, store pointers in a container. It works, but now your API is littered with `unique_ptr` and heap allocations are visible to callers. What if you want the same polymorphic behavior but with value semantics, where the memory management is an implementation detail, not part of your interface?
 
 That's the problem type erasure solves. We'll start from the familiar virtual function approach, see where it falls short, and build up to a technique that gives you polymorphism without exposing the plumbing.
@@ -179,13 +181,13 @@ impl Shape for ThirdPartyCircle {
 }
 ```
 
-This is a key difference: C++ needs the external polymorphism pattern as a workaround, while Rust's trait system provides it naturally.
+A key difference: C++ needs the external polymorphism pattern as a workaround, while Rust's trait system provides it naturally.
 
 [^newtype]: If you need to implement a foreign trait for a foreign type, you can use the newtype pattern as a workaround for the [orphan rule](https://doc.rust-lang.org/reference/items/implementations.html#orphan-rules): wrap the foreign type in your own struct and implement the trait on that.
 
 ## Enter type erasure
 
-We've solved intrusiveness, but pointers are still visible in the API. Type erasure hides them.
+We've solved intrusiveness, but pointers are still visible in the API. Type erasure hides them. The idea is: what if the heap allocation was an implementation detail, not something your callers had to think about?
 
 Consider `std::function` in C++:
 
@@ -211,7 +213,7 @@ Notice:
 - no inheritance required;
 - the concrete type is "erased" behind `std::function`.
 
-This is type erasure: the concrete type is hidden behind a uniform interface, and callers use value semantics.
+That's type erasure: the concrete type is hidden behind a uniform interface, and callers use value semantics.
 
 {% alert(type="note") %}
 The heap allocation still happens internally, but it's an implementation detail hidden from callers.
@@ -221,7 +223,7 @@ The heap allocation still happens internally, but it's an implementation detail 
 
 ### C++: the manual approach
 
-C++ doesn't provide type erasure as a language feature, and instead you implement it using the "external polymorphism" pattern (see Sean Parent's [*Inheritance Is The Base Class of Evil*](https://www.youtube.com/watch?v=2bLkxj6EVoM) talk and Klaus Iglberger's [*C++ Software Design*](https://www.oreilly.com/library/view/c-software-design/9781098113155/) for in-depth treatments).
+C++ doesn't provide type erasure as a language feature. You build it yourself, which is either empowering or exhausting depending on your disposition. The standard approach uses the "external polymorphism" pattern (see Sean Parent's [*Inheritance Is The Base Class of Evil*](https://www.youtube.com/watch?v=2bLkxj6EVoM) talk and Klaus Iglberger's [*C++ Software Design*](https://www.oreilly.com/library/view/c-software-design/9781098113155/) for in-depth treatments).
 
 The idea is to nest the polymorphic machinery inside a value-semantic wrapper. First, define a `Concept` (the interface) and a templated `Model` (the wrapper):
 
@@ -280,7 +282,7 @@ Look at `main()`: no `unique_ptr`, no template parameters at the call site, just
 
 The pattern requires some boilerplate: a `Concept` base class, a templated `Model` that wraps concrete types, and a `unique_ptr` to hide the heap allocation. These names ("Concept" and "Model") are the standard terminology for this pattern. The template constructor accepts any type with the required methods, and type checking happens at template instantiation.
 
-This is the same technique used internally by `std::function` and `std::any`.
+The same technique powers `std::function` and `std::any`.
 
 ### Rust: first-class trait objects
 
@@ -355,7 +357,7 @@ In practice, this C++-style wrapper pattern is rare in Rust. The trait system's 
 
 ## Where C++ has the edge
 
-Rust's built-in type erasure is convenient, but C++'s manual approach offers more flexibility in certain scenarios:
+Rust's built-in type erasure is convenient, but C++'s manual approach offers more flexibility in certain scenarios. Whether that flexibility is worth the boilerplate is a question I'll leave to you and your therapist.
 
 1. **Small buffer optimization** - C++'s `std::function` stores small callables inline, avoiding heap allocation (see Raymond Chen's [explanation of how this works](https://devblogs.microsoft.com/oldnewthing/20200514-00/?p=103749)). Rust's `Box<dyn Trait>` always heap-allocates[^sbo].
 
