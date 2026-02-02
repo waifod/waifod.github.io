@@ -98,7 +98,7 @@ The compiler only sees `Shape*`. It can't know the pointee type, so it must emit
 
 ### The benchmarks
 
-I ran benchmarks comparing direct calls, virtual dispatch, and `final` classes, iterating over 10000 shapes calling `getArea()`. Code is on [GitHub](https://github.com/waifod/blog_code_samples/tree/main/2026-01-26_polymorphism_crtp). Machine is a [Hetzner Cloud CAX21](/blog/my-metal/#hetzner-cloud-cax21) (ARM Neoverse-N1), compiled with clang 21.1.8 at `-O2`. Full `perf stat` output is in the [appendix](#appendix-raw-benchmark-output).
+I ran benchmarks comparing direct calls, virtual dispatch, and `final` classes, iterating over 10000 shapes calling `getArea()`. Code is on [GitHub](https://github.com/waifod/code_samples/tree/main/2026-01-26_polymorphism_crtp). Machine is a [Hetzner Cloud CAX11](/blog/my-metal/#hetzner-cloud-cax11) (ARM Neoverse-N1), compiled with clang 21.1.8 at `-O2`. Full `perf stat` output is in the [appendix](#appendix-raw-benchmark-output).
 
 ```sh
 $ perf stat \
@@ -603,7 +603,7 @@ Rust's traits provide all of this more cleanly: default implementations, static 
 
 For nerds who don't trust summary tables.
 
-Machine: [Hetzner Cloud CAX21](/blog/my-metal/#hetzner-cloud-cax21) (ARM Neoverse-N1, 4 vCPUs @ 2.5GHz), Fedora 43, clang 21.1.8.
+Machine: [Hetzner Cloud CAX11](/blog/my-metal/#hetzner-cloud-cax11) (ARM Neoverse-N1, 2 vCPUs @ 2.5GHz), Fedora 43, clang 21.1.8.
 
 ### Direct
 

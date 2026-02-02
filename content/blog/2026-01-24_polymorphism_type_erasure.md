@@ -367,7 +367,7 @@ Rust's built-in type erasure is convenient, but C++'s manual approach offers mor
 
 C++ and Rust both support type erasure, but with different tradeoffs. Rust's `dyn Trait` makes the common case trivial: no boilerplate, non-intrusive traits, and the compiler handles the vtable. C++ requires manual implementation but offers more flexibility: no object safety restrictions, and `std::function` provides SBO out of the box for callables. For custom type erasure, both languages require extra effort if you want optimizations like SBO or custom storage.
 
-Code samples available on [GitHub](https://github.com/waifod/blog_code_samples/tree/main/2026-01-24_polymorphism_type_erasure).
+Code samples available on [GitHub](https://github.com/waifod/code_samples/tree/main/2026-01-24_polymorphism_type_erasure).
 
 This post was inspired by David Álvarez Rosa's [*Deriving Type Erasure*](https://beta.alvarezrosa.com/posts/deriving-type-erasure/).
 
