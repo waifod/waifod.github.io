@@ -39,7 +39,7 @@ Resources I've bookmarked for learning software engineering. Some I've actually 
 ### Languages
 - [The Rust Programming Language](https://doc.rust-lang.org/book/) - systems programming with memory safety
 - [The Rustonomicon](https://doc.rust-lang.org/nomicon/) - unsafe Rust
-- [Programming in C](https://www.pearson.com/en-us/subject-catalog/p/programming-in-c/P200000003471)
+- [Modern C](https://gustedt.gitlabpages.inria.fr/modern-c/) - Jens Gustedt, free online, covers C23
 - [Ziglearn](https://ziglearn.org/) - Zig tutorial
 - [Jai Primer](https://github.com/BSVino/JaiPrimer/blob/master/JaiPrimer.md) - community guide to Jai
 
@@ -66,6 +66,7 @@ Resources I've bookmarked for learning software engineering. Some I've actually 
 - [CU Boulder MS-CS on Coursera](https://www.coursera.org/degrees/ms-computer-science-boulder) - flexible online MS
 
 ### Self-paced
+- [MIT 6.172 Performance Engineering](https://www.youtube.com/playlist?list=PLUl4u3cNGP63VIBQVWguXxZZi0566y7Wf) - the MIT course on making code fast
 - [Computer, Enhance!](https://www.computerenhance.com/) - performance-aware programming (Casey Muratori)
 - [CS Primer](https://csprimer.com/) - CS fundamentals with a systems focus
 
@@ -75,6 +76,12 @@ Resources I've bookmarked for learning software engineering. Some I've actually 
 
 ### Build-your-own
 - [CodeCrafters](https://codecrafters.io/) - build Redis, Git, SQLite from scratch
+- [Writing an OS in Rust](https://os.phil-opp.com/) - the classic
+- [Writing a JPEG Decoder in Rust](https://mht.wtf/post/jpeg-rust-1/) - surprisingly fun format to reverse-engineer
+- [What's in a Linux Executable?](https://fasterthanli.me/series/making-our-own-executable-packer/part-1) - ELF deep dive (fasterthanlime)
+- [Writing a Wayland Compositor](https://drewdevault.com/2018/02/17/Writing-a-Wayland-compositor-1.html) - Drew DeVault
+- [FFmpeg Assembly Lessons](https://github.com/FFmpeg/asm-lessons/blob/main/lesson_01/index.md) - x86 assembly, from the FFmpeg project
+- [Linux in a Pixel Shader](https://blog.pimaker.at/texts/rvc1/) - a RISC-V emulator that runs Linux inside VRChat, which is a sentence
 - [Ray Tracing In One Weekend](https://raytracing.github.io/)
 - [Operating System in 1000 Lines](https://operating-system-in-1000-lines.vercel.app/en)
 - [Build a Database in 3000 Lines](https://build-your-own.org/blog/20251015_db_in_3000/)
@@ -115,22 +122,34 @@ Resources I've bookmarked for learning software engineering. Some I've actually 
 - [Memory access is O(N^[1/3])](https://vitalik.eth.limo/general/2025/10/05/memory13.html)
 - [Untangling Lifetimes: The Arena Allocator](https://www.rfleury.com/p/untangling-lifetimes-the-arena-allocator)
 - [Static Search Trees](https://curiouscoding.nl/posts/static-search-tree/) - cache-aware data structures
+- [Pointers Are Complicated](https://www.ralfj.de/blog/2018/07/24/pointers-and-bytes.html) - Ralf Jung on pointer semantics
+- [The RAM Myth](https://purplesyringa.moe/blog/the-ram-myth/) - memory is not what you think it is
+- [abseil / Performance Hints](https://abseil.io/fast/hints.html) - practical optimization tips from Google
 
 ### Concurrency
 - [Optimizing a Ring Buffer for Throughput](https://rigtorp.se/ringbuffer/) - lock-free SPSC queue
 - [1024cores](https://sites.google.com/site/1024cores/home/lock-free-algorithms) - Dmitry Vyukov's lock-free algorithms
 - [Futexes Are Tricky](https://www.kernel.org/doc/ols/2002/ols2002-pages-479-495.pdf) - Ulrich Drepper
+- [Acquire-Release Semantics](https://davekilian.com/acquire-release.html) - memory ordering explained clearly
+- [Linux-Kernel Memory Model](https://www.open-std.org/jtc1/sc22/wg21/docs/papers/2023/p0124r8.html) - the formal model
 
 ### Other
 - [Borrow checking, RC, GC, and the Eleven Other Memory Safety Approaches](https://verdagon.dev/grimoire/grimoire)
 - [Linux IP Networking](https://www.cs.unh.edu/cnrg/people/gherrin/linux-net.html) - Linux protocol stack
 - [Compiler Engineering in Practice](https://chisophugis.github.io/2025/12/08/compiler-engineering-in-practice-part-1-what-is-a-compiler.html)
+- [C++ Design Patterns for Low-Latency Applications](https://arxiv.org/pdf/2309.04259) - patterns from trading systems
+- [Four Limitations of Rust's Borrow Checker](https://blog.polybdenum.com/2024/12/21/four-limitations-of-rust-s-borrow-checker.html)
+- [Why Is Rust Difficult?](https://vorner.github.io/difficult.html)
+- [yarchive.net/comp](https://yarchive.net/comp/index.html) - archived Usenet posts from Linus Torvalds, Mitch Alsup, Terje Mathisen
 
 ---
 
 ## Tools
 
 - [Compiler Explorer](https://godbolt.org/) - see what your code compiles to
+- [CREATOR](https://creatorsim.github.io/) - RISC-V and MIPS assembly simulator
+- [Vim Hero](https://www.vim-hero.com/) - interactive Vim lessons
+- [awesome-shell](https://github.com/alebcay/awesome-shell) - curated list of CLI tools
 - **gdb** - the GNU debugger
 - **perf** - Linux profiling
 - **valgrind** - memory debugging and profiling
@@ -164,5 +183,4 @@ Resources I've bookmarked for learning software engineering. Some I've actually 
 - [Bisqwit](https://www.youtube.com/@Bisqwit) - retro programming
 - [Tsoding](https://www.youtube.com/@Tsoding) - low-level programming
 - [Nir Lichtman](https://www.youtube.com/@nirlichtman) - low-level programming
-- [mCoding](https://www.youtube.com/@mCoding) - programming concepts
 - [Sheafification of G](https://www.youtube.com/@SheafificationOfG) - math and CS theory
