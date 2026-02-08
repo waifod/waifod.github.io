@@ -10,4 +10,4 @@ On the math side, I'm interested in homotopical mathematics - particularly highe
 
 Besides technical challenges, I enjoy Latino dances, weightlifting, reading, anime and lots of other things.
 
-Here is my [CV](/cv.pdf).
+Here is my [CV](/cv_matteo_durante.pdf).
