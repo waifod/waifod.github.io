@@ -8,7 +8,7 @@
     <updated>2026-02-21T00:00:00+00:00</updated>
     <id>https://waifod.dev/tags/resources/atom.xml</id>
     <entry xml:lang="en">
-        <title>Getting into MANGA</title>
+        <title>Getting into big tech</title>
         <published>2026-02-21T00:00:00+00:00</published>
         <updated>2026-02-21T00:00:00+00:00</updated>
         
@@ -20,8 +20,8 @@
           </name>
         </author>
         
-        <link rel="alternate" type="text/html" href="https://waifod.dev/blog/getting-into-manga/"/>
-        <id>https://waifod.dev/blog/getting-into-manga/</id>
+        <link rel="alternate" type="text/html" href="https://waifod.dev/blog/getting-into-big-tech/"/>
+        <id>https://waifod.dev/blog/getting-into-big-tech/</id>
         
         <summary type="html">&lt;p&gt;Resources and advice I give people trying to get into large tech companies as software engineers. None of this is secret knowledge; the value is in having it organized.&lt;&#x2F;p&gt;</summary>
         
