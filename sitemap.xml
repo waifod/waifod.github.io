@@ -7,6 +7,10 @@
         <loc>https://waifod.dev/blog/</loc>
     </url>
     <url>
+        <loc>https://waifod.dev/blog/getting-into-manga/</loc>
+        <lastmod>2026-02-21</lastmod>
+    </url>
+    <url>
         <loc>https://waifod.dev/blog/learning-software-engineering/</loc>
         <lastmod>2026-01-04</lastmod>
     </url>
@@ -44,6 +48,9 @@
     </url>
     <url>
         <loc>https://waifod.dev/tags/c/</loc>
+    </url>
+    <url>
+        <loc>https://waifod.dev/tags/career/</loc>
     </url>
     <url>
         <loc>https://waifod.dev/tags/hardware/</loc>
