@@ -51,6 +51,7 @@ main_menu = [
     { name = "blog", url = "blog", trailing_slash = true },
     { name = "tags", url = "tags", trailing_slash = true },
     { name = "github", url = "https://github.com/waifod", new_tab = true },
+    { name = "cv", url = "cv_matteo_durante.pdf" },
 ]
 
 # Social links
