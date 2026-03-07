@@ -76,6 +76,12 @@ socials = [
     { name = "email", url = "mailto:waifod@pm.me" },
 ]
 
+[extra.content_security_policy]
+enable = true
+allowed_domains = [
+    { directive = "img-src", domains = ["'self'", "data:"] },
+]
+
 [extra.responsive_images]
 widths = [640, 784, 1280, 1920, 2560]
 fallback_width = 1280

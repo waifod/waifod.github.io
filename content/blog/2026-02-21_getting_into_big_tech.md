@@ -39,7 +39,8 @@ CV writing deserves its own post. A few basics:
 
 Write it in LaTeX or Typst, not Word or Google Docs. Structured markup is easier to maintain, produces consistent output, and gives you a source file you can hand to an LLM for editing. On that note: dump everything you can think of into an LLM, relevant or not (past jobs, projects, skills, education, hobbies, whatever), and let it help you draft and iterate. It's good at separating what's relevant from what isn't, and at finding the strongest phrasings. You'll still need to edit the output, but it's a good way to get past the blank page.
 
-One warning: make sure the final version sounds like you, not like an LLM. Recruiters and hiring managers are increasingly hostile toward what they perceive as AI-generated prose, and the reaction is not positive. The generic, overenthusiastic tone that LLMs default to ("spearheaded cross-functional initiatives to drive impactful outcomes") reads as lazy at best and dishonest at worst. Use the LLM for structure, ideas, and feedback; rewrite the language yourself.
+> [!WARNING]
+> Make sure the final version sounds like you, not like an LLM. Recruiters and hiring managers are increasingly hostile toward what they perceive as AI-generated prose, and the reaction is not positive. The generic, overenthusiastic tone that LLMs default to ("spearheaded cross-functional initiatives to drive impactful outcomes") reads as lazy at best and dishonest at worst. Use the LLM for structure, ideas, and feedback; rewrite the language yourself.
 
 For other tips, see [Tech Interview Handbook's resume section](https://www.techinterviewhandbook.org/resume/).
 
