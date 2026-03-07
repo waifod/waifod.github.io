@@ -1,10 +1,12 @@
 # The URL the site will be built for
 base_url = "https://waifod.dev"
 
-# Site metadata
-author = "Matteo Durante"
+# The site title and description; used in feeds by default.
 title = "よ waifod"
 description = "Mathematics, software, and other things"
+
+# The default author for pages
+author = "Matteo Durante"
 
 # Theme configuration
 theme = "terminus"
@@ -18,35 +20,49 @@ build_search_index = false
 # Whether to minify the HTML output
 minify_html = true
 
-# Whether to generate RSS/Atom feeds
+# When set to "true", a feed is automatically generated.
 generate_feeds = true
 feed_filenames = ["atom.xml"]
 
-# Taxonomies configuration
+# The taxonomies to be rendered for the site and their configuration of the default languages
+# Example:
+#     taxonomies = [
+#       {name = "tags", feed = true}, # each tag will have its own feed
+#       {name = "tags"}, # you can have taxonomies with the same name in multiple languages
+#       {name = "categories", paginate_by = 5},  # 5 items per page for a term
+#       {name = "authors"}, # Basic definition: no feed or pagination
+#     ]
+#
 taxonomies = [
-    { name = "tags", feed = true }
+    { name = "tags", feed = true },
 ]
 
 [markdown]
-# Whether to do syntax highlighting
-# Theme can be customised by setting the `highlight_theme` variable to a theme supported by Zola
-highlight_code = true
-
-# Whether footnotes are rendered in the GitHub-style (at the bottom, with back references) or plain (in the place, where they are defined)
-bottom_footnotes = true
-
 # When set to "true", emoji aliases translated to their corresponding
 # Unicode emoji equivalent in the rendered Markdown files. (e.g.: :smile: => 😄)
 render_emoji = true
 
+# Whether footnotes are rendered in the GitHub-style (at the bottom, with back references) or plain (in the place, where they are defined)
+bottom_footnotes = true
+
 # When set to "true", support for GitHub-style alerts, a.k.a. callouts or admonitions, is enabled in the Markdown parser.
 github_alerts = true
 
+[markdown.highlighting]
+# Whether to use inline hex colours ("inline") or CSS classes ("class").
+# See https://www.getzola.org/documentation/content/syntax-highlighting/ for details.
+style = "inline"
+
+# The theme to use for code highlighting.
+# See https://github.com/getzola/giallo?tab=readme-ov-file#themes for the list of allowed values.
+theme = "gruvbox-dark-medium"
+
 [extra]
+close_responsive_menu_on_resize = true
 favicon = "favicon.svg"
+layout = "center"
 show_default_author = false
 
-# Navigation menu
 main_menu = [
     { name = "blog", url = "blog", trailing_slash = true },
     { name = "tags", url = "tags", trailing_slash = true },
@@ -54,9 +70,12 @@ main_menu = [
     { name = "cv", url = "cv_matteo_durante.pdf" },
 ]
 
-# Social links
 socials = [
     { name = "github", url = "https://github.com/waifod" },
     { name = "linkedin", url = "https://www.linkedin.com/in/waifod/" },
     { name = "email", url = "mailto:waifod@pm.me" },
 ]
+
+[extra.responsive_images]
+widths = [640, 784, 1280, 1920, 2560]
+fallback_width = 1280
