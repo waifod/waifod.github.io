@@ -2,7 +2,7 @@
 base_url = "https://waifod.dev"
 
 # The site title and description; used in feeds by default.
-title = "よ waifod"
+title = "waifod"
 description = "Mathematics, software, and other things"
 
 # The default author for pages
@@ -33,9 +33,7 @@ feed_filenames = ["atom.xml"]
 #       {name = "authors"}, # Basic definition: no feed or pagination
 #     ]
 #
-taxonomies = [
-    { name = "tags", feed = true },
-]
+taxonomies = [{ name = "tags", feed = true }]
 
 [markdown]
 # When set to "true", emoji aliases translated to their corresponding
@@ -64,23 +62,21 @@ layout = "center"
 show_default_author = false
 
 main_menu = [
-    { name = "blog", url = "blog", trailing_slash = true },
-    { name = "tags", url = "tags", trailing_slash = true },
-    { name = "github", url = "https://github.com/waifod", new_tab = true },
-    { name = "cv", url = "cv_matteo_durante.pdf" },
+  { name = "blog", url = "blog", trailing_slash = true },
+  { name = "tags", url = "tags", trailing_slash = true },
+  { name = "github", url = "https://github.com/waifod", new_tab = true },
+  { name = "cv", url = "cv_matteo_durante.pdf" },
 ]
 
 socials = [
-    { name = "github", url = "https://github.com/waifod" },
-    { name = "linkedin", url = "https://www.linkedin.com/in/waifod/" },
-    { name = "email", url = "mailto:waifod@pm.me" },
+  { name = "github", url = "https://github.com/waifod" },
+  { name = "linkedin", url = "https://www.linkedin.com/in/waifod/" },
+  { name = "email", url = "mailto:waifod@pm.me" },
 ]
 
 [extra.content_security_policy]
 enable = true
-allowed_domains = [
-    { directive = "img-src", domains = ["'self'", "data:"] },
-]
+allowed_domains = [{ directive = "img-src", domains = ["'self'", "data:"] }]
 
 [extra.responsive_images]
 widths = [640, 784, 1280, 1920, 2560]
