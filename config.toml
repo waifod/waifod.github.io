@@ -53,10 +53,11 @@ style = "inline"
 
 # The theme to use for code highlighting.
 # See https://github.com/getzola/giallo?tab=readme-ov-file#themes for the list of allowed values.
-theme = "gruvbox-dark-medium"
+theme = "synthwave-84"
 
 [extra]
 close_responsive_menu_on_resize = true
+color_scheme = "synthwave-84"
 favicon = "favicon.svg"
 layout = "center"
 show_default_author = false
